@@ -103,7 +103,7 @@ function MobileNavbar({
   setMobileMenuOpen,
 }) {
   return (
-    <div className="block bg-black shadow-xl ring-1 ring-gray-900/5 px-4 py-6 absolute  left-0 w-full z-50 animate-fade-in">
+    <div className="bg-black shadow-xl ring-1 ring-gray-900/5 px-4 py-6 absolute  left-0 w-full z-50 animate-fade-in">
       <nav className="flex flex-col gap-4">
         {/* Location Section */}
         <div className="mb-4">
@@ -186,7 +186,7 @@ function Navbar() {
   if (!mounted) return null;
 
   return isMobile ? (
-    <>
+    <div className="fixed top-0 left-0 w-full z-50">
       <MobileNavbar
         location={location}
         setLocation={setLocation}
@@ -196,8 +196,8 @@ function Navbar() {
         setSearchQuery={setSearchQuery}
         setMobileMenuOpen={setMobileMenuOpen}
       />
-      <FeacturedSections className="mt-40" />
-    </>
+      <FeacturedSections className="mt-55" />
+    </div>
   ) : (
     <>
       <DesktopNavbar

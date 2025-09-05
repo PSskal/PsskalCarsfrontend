@@ -11,6 +11,7 @@ import { FaUser } from "react-icons/fa";
 import Banner from "../carros/Banner";
 import Hero from "../carros/Hero";
 import FeacturedSections from "../carros/FeacturedSections";
+import BrandScrollHorizontal from "../carros/BrandScrollHorizontal";
 
 // Hook para detectar si es móvil
 function useIsMobile(breakpoint = 767) {
@@ -103,7 +104,7 @@ function MobileNavbar({
   setMobileMenuOpen,
 }) {
   return (
-    <div className="bg-black shadow-xl ring-1 ring-gray-900/5 px-4 py-6 absolute  left-0 w-full z-50 animate-fade-in">
+    <div className="bg-black shadow-xl ring-1 ring-gray-900/5 px-4 py-6  relative left-0 w-full z-50 animate-fade-in">
       <nav className="flex flex-col gap-4">
         {/* Location Section */}
         <div className="mb-4">
@@ -186,7 +187,7 @@ function Navbar() {
   if (!mounted) return null;
 
   return isMobile ? (
-    <div className="fixed top-0 left-0 w-full z-50">
+    <div className="relative">
       <MobileNavbar
         location={location}
         setLocation={setLocation}
@@ -196,7 +197,8 @@ function Navbar() {
         setSearchQuery={setSearchQuery}
         setMobileMenuOpen={setMobileMenuOpen}
       />
-      <FeacturedSections className="mt-55" />
+      <BrandScrollHorizontal />
+      <FeacturedSections className="mt-2" />
     </div>
   ) : (
     <>

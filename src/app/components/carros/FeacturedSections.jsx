@@ -10,7 +10,7 @@ const FeacturedSections = ({ className = "" }) => {
     <div
       className={`flex flex-col items-center px-6 md:px-4 lg:px-10 xl:px-7 ${className}`}
     >
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-18">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-5">
         {dummyCarData.slice(0, 6).map((car) => (
           <div key={car.id} className="">
             <CarCard car={car} className="flex-1 h-full" />

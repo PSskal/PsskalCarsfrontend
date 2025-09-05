@@ -81,10 +81,7 @@ export default function CarDetailsPage() {
   }, [id]);
 
   return car ? (
-    <div
-      data-scroll-section
-      className="p-25 px-6 md:px-16 lg:px-24 xl:px-32 mt-16"
-    >
+    <div data-scroll-section className="px-6 md:px-16 lg:px-24 xl:px-32 mt-4">
       <button
         className="flex items-center gap-2 mb-6 text-gray-500 cursor-pointer hover:text-gray-700"
         onClick={() => window.history.back()}

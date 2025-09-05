@@ -104,8 +104,8 @@ function MobileNavbar({
   setMobileMenuOpen,
 }) {
   return (
-    <div className="bg-black shadow-xl ring-1 ring-gray-900/5 px-4 py-6  relative left-0 w-full z-50 animate-fade-in">
-      <nav className="flex flex-col gap-4">
+    <nav className="bg-[#1b1b1b] shadow-xl fixed ring-gray-900/5 px-4 py-6  left-0 w-full z-50 animate-fade-in">
+      <div className="flex flex-col gap-4">
         {/* Location Section */}
         <div className="mb-4">
           <div className="text-gray-400 text-sm mb-1">Location</div>
@@ -166,8 +166,8 @@ function MobileNavbar({
           <IoIosAdd className="font-bold mr-2 text-xl" />
           Vender Carro
         </Link>
-      </nav>
-    </div>
+      </div>
+    </nav>
   );
 }
 
@@ -187,18 +187,20 @@ function Navbar() {
   if (!mounted) return null;
 
   return isMobile ? (
-    <div className="relative">
-      <MobileNavbar
-        location={location}
-        setLocation={setLocation}
-        showLocationMenu={showLocationMenu}
-        setShowLocationMenu={setShowLocationMenu}
-        searchQuery={searchQuery}
-        setSearchQuery={setSearchQuery}
-        setMobileMenuOpen={setMobileMenuOpen}
-      />
-      <BrandScrollHorizontal />
-      <FeacturedSections className="mt-2" />
+    <div>
+      <div className="relative">
+        <MobileNavbar
+          location={location}
+          setLocation={setLocation}
+          showLocationMenu={showLocationMenu}
+          setShowLocationMenu={setShowLocationMenu}
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+          setMobileMenuOpen={setMobileMenuOpen}
+        />
+        <BrandScrollHorizontal />
+        <FeacturedSections />
+      </div>
     </div>
   ) : (
     <>

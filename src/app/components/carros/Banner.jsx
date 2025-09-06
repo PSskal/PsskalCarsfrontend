@@ -6,6 +6,8 @@ import {
   FaCheckCircle,
   FaMoneyBillWave,
 } from "react-icons/fa";
+import brands from "./carBrands";
+
 export default function Banner({ cars = [] }) {
   const [freeTestDrive, setFreeTestDrive] = useState(false);
   const [carType, setCarType] = useState("New Car");
@@ -100,17 +102,38 @@ export default function Banner({ cars = [] }) {
         </div>
         {/* Brand */}
         <div className="mb-6">
-          <h4 className="font-medium mb-3">Brand</h4>
+          <h4 className="mb-3 font-bold">Marcas</h4>
           <div className="space-y-2">
-            {["All Brand", "BMW", "Mercedes Benz", "Tesla"].map((brand) => (
-              <div key={brand} className="flex items-center gap-2">
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2 flex-1">
+                <span className="text-sm font-bold">Todas las marcas</span>
+              </div>
+              <input
+                type="checkbox"
+                checked={selectedBrands.includes("All Brand")}
+                onChange={() => toggleBrand("All Brand")}
+                className="rounded"
+              />
+            </div>
+            {brands.map((brand) => (
+              <div
+                key={brand.name}
+                className="flex items-center justify-between mb-2"
+              >
+                <div className="flex items-center gap-2 flex-1">
+                  <img
+                    src={brand.img}
+                    alt={brand.name}
+                    className="w-6 h-6 object-contain"
+                  />
+                  <span className="text-sm font-bold">{brand.name}</span>
+                </div>
                 <input
                   type="checkbox"
-                  checked={selectedBrands.includes(brand)}
-                  onChange={() => toggleBrand(brand)}
-                  className="rounded"
+                  checked={selectedBrands.includes(brand.name)}
+                  onChange={() => toggleBrand(brand.name)}
+                  className="rounded-3xl font-bold"
                 />
-                <span className="text-sm">{brand}</span>
               </div>
             ))}
           </div>

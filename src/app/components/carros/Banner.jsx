@@ -9,7 +9,7 @@ import {
 import brands from "./carBrands";
 
 export default function Banner({ cars = [] }) {
-  const [freeTestDrive, setFreeTestDrive] = useState(false);
+  const [automatic, setAutomatic] = useState(false);
   const [carType, setCarType] = useState("New Car");
   const [selectedBrands, setSelectedBrands] = useState(["All Brand"]);
   const [priceRange, setPriceRange] = useState([50000, 500000]);
@@ -41,7 +41,7 @@ export default function Banner({ cars = [] }) {
   }
 
   function resetFilters() {
-    setFreeTestDrive(false);
+    setAutomatic(false);
     setCarType("New Car");
     setSelectedBrands(["All Brand"]);
     setPriceRange([50000, 500000]);
@@ -65,12 +65,12 @@ export default function Banner({ cars = [] }) {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <FaCheckCircle className="w-6 h-6 text-gray-400" />
-              <span className="text-sm">Free Test Drive</span>
+              <span className="text-sm">Automatico</span>
             </div>
             <input
               type="checkbox"
-              checked={freeTestDrive}
-              onChange={(e) => setFreeTestDrive(e.target.checked)}
+              checked={automatic}
+              onChange={(e) => setAutomatic(e.target.checked)}
             />
           </div>
         </div>

@@ -6,7 +6,7 @@ const brands = [
   },
   {
     name: "Hyundai",
-    img: "https://www.svgrepo.com/show/446878/hyundai.svg",
+    img: "https://car-brand-names.com/wp-content/uploads/2016/01/Hyundai-Logo.png",
   },
   {
     name: "Kia",
@@ -18,7 +18,7 @@ const brands = [
   },
   {
     name: "Nissan",
-    img: "https://upload.wikimedia.org/wikipedia/commons/2/23/Nissan_2020_logo.svg",
+    img: "https://www.foment.com/wp-content/uploads/2020/04/1200px-Nissan-logo.svg_.png",
   },
   {
     name: "Suzuki",
@@ -34,7 +34,7 @@ const brands = [
   },
   {
     name: "Mazda",
-    img: "https://www.svgrepo.com/show/446894/mazda.svg",
+    img: "https://cdn.worldvectorlogo.com/logos/mazda-2.svg",
   },
 ];
 export default brands;

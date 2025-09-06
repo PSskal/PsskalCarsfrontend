@@ -11,7 +11,6 @@ function MobileNavbar({
   setShowLocationMenu,
   searchQuery,
   setSearchQuery,
-  setMobileMenuOpen,
 }) {
   return (
     <nav className="bg-[#1b1b1b] shadow-xl fixed ring-gray-900/5 px-4 py-6  left-0 w-full z-50 animate-fade-in">
@@ -31,9 +30,9 @@ function MobileNavbar({
               <div className="absolute left-0 mt-2 bg-black w-full rounded shadow-lg z-10">
                 {[
                   "Lima, Perú",
-                  "Surabaya, Indonesia",
-                  "Bandung, Indonesia",
-                  "Semarang, Indonesia",
+                  "Arequipa, Perú",
+                  "Cusco, Perú",
+                  "Chiclayo, Perú",
                 ].map((loc) => (
                   <button
                     key={loc}
@@ -69,9 +68,8 @@ function MobileNavbar({
         </div>
         {/* Sell Car Button */}
         <Link
-          href="/contacto"
+          href="/sell-car "
           className="w-full inline-flex items-center justify-center rounded-lg bg-[#4375f7] px-6 py-4 text-lg font-medium text-white shadow-sm hover:bg-blue-700 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-          onClick={() => setMobileMenuOpen(false)}
         >
           <IoIosAdd className="font-bold mr-2 text-xl" />
           Vender Carro

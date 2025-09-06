@@ -5,13 +5,18 @@ import { FaArrowRight } from "react-icons/fa";
 import Link from "next/link";
 import dummyCarData from "./carData";
 
-const FeacturedSections = ({ className = "" }) => {
+const FeacturedSections = ({ filteredCars }) => {
+  const carsToShow =
+    filteredCars && filteredCars.length > 0
+      ? filteredCars.slice(0, 6)
+      : dummyCarData.slice(0, 6);
+
   return (
     <div
-      className={`flex flex-col items-center px-6 md:px-4 lg:px-10 xl:px-7 ${className}`}
+      className={`flex flex-col items-center px-6 md:px-4 lg:px-10 xl:px-7 `}
     >
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-5">
-        {dummyCarData.slice(0, 6).map((car) => (
+        {carsToShow.map((car) => (
           <div key={car.id} className="">
             <CarCard car={car} className="flex-1 h-full" />
           </div>

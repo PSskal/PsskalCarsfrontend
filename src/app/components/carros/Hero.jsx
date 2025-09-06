@@ -1,9 +1,8 @@
 "use client";
 import React, { useState } from "react";
 import { FaSearch, FaFilter, FaSlidersH } from "react-icons/fa";
-export default function Hero() {
+export default function Hero({ searchQuery, setSearchQuery }) {
   const [activeTab, setActiveTab] = useState("Buy Car");
-  const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("Recommended");
 
   return (

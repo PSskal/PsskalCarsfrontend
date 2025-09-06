@@ -27,10 +27,10 @@ function DesktopNavbar({
             {showLocationMenu && (
               <div className="absolute left-0 mt-2 w-56 bg-white rounded shadow-lg z-10">
                 {[
-                  "Jakarta, Indonesia",
-                  "Surabaya, Indonesia",
-                  "Bandung, Indonesia",
-                  "Semarang, Indonesia",
+                  "Lima, Perú",
+                  "Arequipa, Perú",
+                  "Cusco, Perú",
+                  "Chiclayo, Perú",
                 ].map((loc) => (
                   <button
                     key={loc}

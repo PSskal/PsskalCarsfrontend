@@ -1,7 +1,7 @@
 import React from "react";
 import brands from "./carBrands";
 
-const BrandScrollHorizontal = () => {
+const BrandScrollHorizontal = ({ setSearchQuery }) => {
   return (
     <div className="w-full py-2 pt-70">
       <h3 className="text-lg font-semibold mb-4 px-4">Buscar por marcas</h3>
@@ -16,6 +16,7 @@ const BrandScrollHorizontal = () => {
               alt={brand.name}
               className="w-18 h-18 object-contain mb-2"
               draggable={false}
+              onClick={() => setSearchQuery(brand.name)}
             />
           </div>
         ))}

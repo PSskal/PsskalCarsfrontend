@@ -1,5 +1,4 @@
 "use client";
-import { IoIosAdd } from "react-icons/io";
 import { useState, useEffect } from "react";
 import Banner from "@/app/components/carros/Banner";
 import Hero from "@/app/components/carros/Hero";
@@ -8,6 +7,7 @@ import BrandScrollHorizontal from "@/app/components/carros/BrandScrollHorizontal
 import DesktopNavbar from "@/app/components/carros/DesktopNavbar";
 import MobileNavbar from "@/app/components/carros/MobileNavbar";
 import dummyCarData from "@/app/components/carros/carData";
+
 // Hook para detectar si es móvil
 function useIsMobile(breakpoint = 767) {
   const [isMobile, setIsMobile] = useState(
@@ -25,11 +25,10 @@ function useIsMobile(breakpoint = 767) {
 
 const Home = () => {
   const [searchQuery, setSearchQuery] = useState("");
-  const [freeTestDrive, setFreeTestDrive] = useState(false);
+  const [isAutomatic, setIsAutomatic] = useState(false);
   const [carType, setCarType] = useState("New Car");
   const [selectedBrands, setSelectedBrands] = useState(["All Brand"]);
   const [priceRange, setPriceRange] = useState([100, 300000]);
-  const [sortBy, setSortBy] = useState("Recommended");
   const [location, setLocation] = useState("Lima, Peru");
   const [showLocationMenu, setShowLocationMenu] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -45,7 +44,7 @@ const Home = () => {
       .toLowerCase()
       .includes(searchQuery.toLowerCase());
     const matchesTestDrive =
-      !freeTestDrive || car.badges?.includes("Free Test Drive");
+      !isAutomatic || car.transmission?.includes("Automatic");
     const matchesPriceRange =
       car.price >= priceRange[0] && car.price <= priceRange[1];
     const matchesType =
@@ -64,7 +63,7 @@ const Home = () => {
   });
 
   const activeFilters = [];
-  if (freeTestDrive) activeFilters.push("Free Test Drive");
+  if (isAutomatic) activeFilters.push("Automatic");
   if (carType !== "New Car") activeFilters.push(carType);
   if (selectedBrands[0] !== "All Brand")
     activeFilters.push(selectedBrands.join(", "));
@@ -104,7 +103,7 @@ const Home = () => {
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}
         />
-        <BrandScrollHorizontal />
+        <BrandScrollHorizontal setSearchQuery={setSearchQuery} />
         <FeacturedSections filteredCars={filteredCars} />
       </div>
     </div>
@@ -120,8 +119,8 @@ const Home = () => {
       <div className="grid grid-cols-5 grid-rows-5 gap-4">
         <div className="row-span-5">
           <Banner
-            freeTestDrive={freeTestDrive}
-            setFreeTestDrive={setFreeTestDrive}
+            isAutomatic={isAutomatic}
+            setIsAutomatic={setIsAutomatic}
             carType={carType}
             setCarType={setCarType}
             selectedBrands={selectedBrands}

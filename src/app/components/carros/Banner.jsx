@@ -13,7 +13,7 @@ import brands from "./carBrands";
 export default function Banner({
   carType,
   setCarType,
-  selectedBrands,
+  selectedBrands = ["All Brand"], // <--- valor por defecto
   setSelectedBrands,
   priceRange,
   setPriceRange,
@@ -92,7 +92,10 @@ export default function Banner({
               </div>
               <input
                 type="checkbox"
-                checked={selectedBrands.includes("All Brand")}
+                checked={
+                  Array.isArray(selectedBrands) &&
+                  selectedBrands.includes("All Brand")
+                }
                 onChange={() => toggleBrand("All Brand")}
                 className="rounded cursor-pointer"
               />
@@ -112,7 +115,10 @@ export default function Banner({
                 </div>
                 <input
                   type="checkbox"
-                  checked={selectedBrands[0] === brand.name}
+                  checked={
+                    Array.isArray(selectedBrands) &&
+                    selectedBrands[0] === brand.name
+                  }
                   onChange={() => toggleBrand(brand.name)}
                   className="rounded cursor-pointer font-bold"
                 />

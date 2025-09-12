@@ -9,21 +9,6 @@ import MobileNavbar from "@/app/components/carros/MobileNavbar";
 import { carService } from "@/lib/supabase/services";
 import { useIsMobile } from "@/app/hooks/useIsMobile";
 
-// Hook para detectar si es móvil
-// function useIsMobile(breakpoint = 767) {
-//   const [isMobile, setIsMobile] = useState(
-//     typeof window !== "undefined" ? window.innerWidth < breakpoint : false
-//   );
-//   useEffect(() => {
-//     function handleResize() {
-//       setIsMobile(window.innerWidth < breakpoint);
-//     }
-//     window.addEventListener("resize", handleResize);
-//     return () => window.removeEventListener("resize", handleResize);
-//   }, [breakpoint]);
-//   return isMobile;
-// }
-
 const Home = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [isAutomatic, setIsAutomatic] = useState(false);
@@ -56,6 +41,8 @@ const Home = () => {
     console.log(location);
   }, [location]);
 
+  // console.log("Selected Brands:", selectedBrands);
+
   // Luego aplicar los demás filtros sobre ese resultado
   const filteredCars = cars.filter((car) => {
     const matchesSearch = (car.brand + " " + car.model)
@@ -63,11 +50,12 @@ const Home = () => {
       .includes(searchQuery.toLowerCase());
 
     const matchesBrand =
-      selectedBrands[0] === "All Brand" ||
-      selectedBrands[0].toLowerCase() === car.brand.toLowerCase();
+      Array.isArray(selectedBrands) &&
+      (selectedBrands[0] === "All Brand" ||
+        selectedBrands[0].toLowerCase() === car.brand.toLowerCase());
 
     const matchesTestDrive =
-      !isAutomatic || car.transmission?.includes("Automatic");
+      !isAutomatic || car.transmission?.includes("Automatico");
     const matchesPriceRange =
       car.price >= priceRange[0] && car.price <= priceRange[1];
 
@@ -84,7 +72,7 @@ const Home = () => {
       setSelectedBrands([brand]);
     }
   };
-  console.log(selectedBrands);
+  // console.log(selectedBrands);
 
   if (!mounted) return null;
 

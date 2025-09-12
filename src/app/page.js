@@ -1,94 +1,90 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, use } from "react";
 import Banner from "@/app/components/carros/Banner";
 import Hero from "@/app/components/carros/Hero";
 import FeacturedSections from "@/app/components/carros/FeacturedSections";
 import BrandScrollHorizontal from "@/app/components/carros/BrandScrollHorizontal";
 import DesktopNavbar from "@/app/components/carros/DesktopNavbar";
 import MobileNavbar from "@/app/components/carros/MobileNavbar";
-import dummyCarData from "@/app/components/carros/carData";
+import { carService } from "@/lib/supabase/services";
+import { useIsMobile } from "@/app/hooks/useIsMobile";
 
 // Hook para detectar si es móvil
-function useIsMobile(breakpoint = 767) {
-  const [isMobile, setIsMobile] = useState(
-    typeof window !== "undefined" ? window.innerWidth < breakpoint : false
-  );
-  useEffect(() => {
-    function handleResize() {
-      setIsMobile(window.innerWidth < breakpoint);
-    }
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, [breakpoint]);
-  return isMobile;
-}
+// function useIsMobile(breakpoint = 767) {
+//   const [isMobile, setIsMobile] = useState(
+//     typeof window !== "undefined" ? window.innerWidth < breakpoint : false
+//   );
+//   useEffect(() => {
+//     function handleResize() {
+//       setIsMobile(window.innerWidth < breakpoint);
+//     }
+//     window.addEventListener("resize", handleResize);
+//     return () => window.removeEventListener("resize", handleResize);
+//   }, [breakpoint]);
+//   return isMobile;
+// }
 
 const Home = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [isAutomatic, setIsAutomatic] = useState(false);
   const [carType, setCarType] = useState("New Car");
   const [selectedBrands, setSelectedBrands] = useState(["All Brand"]);
-  const [priceRange, setPriceRange] = useState([100, 300000]);
-  const [location, setLocation] = useState("Lima, Peru");
+  const [priceRange, setPriceRange] = useState([100, 150000]);
+  const [location, setLocation] = useState("Lima");
   const [showLocationMenu, setShowLocationMenu] = useState(false);
   const [mounted, setMounted] = useState(false);
-  const isMobile = useIsMobile(1024);
+  const [cars, setCars] = useState([]);
+  const [page, setPage] = useState(1);
+  const isMobile = useIsMobile();
+
+  // Función para obtener datos de Supabase
+  const { getCarByLocation } = carService;
+  async function fetchCars() {
+    const cars = await getCarByLocation(location);
+    setCars(cars);
+    console.log(cars);
+    return cars;
+  }
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  // Lógica de filtrado
-  const filteredCars = dummyCarData.filter((car) => {
+  useEffect(() => {
+    fetchCars();
+    setPage(1); // <-- Resetea la página
+    console.log(location);
+  }, [location]);
+
+  // Luego aplicar los demás filtros sobre ese resultado
+  const filteredCars = cars.filter((car) => {
     const matchesSearch = (car.brand + " " + car.model)
       .toLowerCase()
       .includes(searchQuery.toLowerCase());
+
+    const matchesBrand =
+      selectedBrands[0] === "All Brand" ||
+      selectedBrands[0].toLowerCase() === car.brand.toLowerCase();
+
     const matchesTestDrive =
       !isAutomatic || car.transmission?.includes("Automatic");
     const matchesPriceRange =
       car.price >= priceRange[0] && car.price <= priceRange[1];
-    const matchesType =
-      carType === "All" ||
-      (carType === "New Car" && !car.isUsed) ||
-      (carType === "Used Car" && car.isUsed);
-    const matchesBrand =
-      selectedBrands[0] === "All Brand" || selectedBrands.includes(car.brand);
+
     return (
-      matchesSearch &&
-      matchesTestDrive &&
-      matchesPriceRange &&
-      matchesType &&
-      matchesBrand
+      matchesSearch && matchesTestDrive && matchesPriceRange && matchesBrand
     );
   });
 
-  const activeFilters = [];
-  if (isAutomatic) activeFilters.push("Automatic");
-  if (carType !== "New Car") activeFilters.push(carType);
-  if (selectedBrands[0] !== "All Brand")
-    activeFilters.push(selectedBrands.join(", "));
-  if (priceRange[0] !== 80000 || priceRange[1] !== 300000) {
-    activeFilters.push(
-      `$${priceRange[0].toLocaleString()} - $${priceRange[1].toLocaleString()}`
-    );
-  }
-
   // Función para alternar marcas
   const toggleBrand = (brand) => {
-    if (brand === "All Brand") {
+    if (selectedBrands[0] === brand) {
       setSelectedBrands(["All Brand"]);
     } else {
-      const newBrands = selectedBrands.includes("All Brand")
-        ? [brand]
-        : selectedBrands.includes(brand)
-        ? selectedBrands.filter((b) => b !== brand)
-        : [...selectedBrands.filter((b) => b !== "All Brand"), brand];
-      setSelectedBrands(newBrands.length === 0 ? ["All Brand"] : newBrands);
+      setSelectedBrands([brand]);
     }
   };
-
-  console.log(searchQuery);
-  console.log(filteredCars);
+  console.log(selectedBrands);
 
   if (!mounted) return null;
 
@@ -102,9 +98,14 @@ const Home = () => {
           setShowLocationMenu={setShowLocationMenu}
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}
+          setSelectedBrands={setSelectedBrands}
         />
-        <BrandScrollHorizontal setSearchQuery={setSearchQuery} />
-        <FeacturedSections filteredCars={filteredCars} />
+        <BrandScrollHorizontal toggleBrand={toggleBrand} />
+        <FeacturedSections
+          filteredCars={filteredCars}
+          page={page}
+          setPage={setPage}
+        />
       </div>
     </div>
   ) : (
@@ -115,7 +116,11 @@ const Home = () => {
         showLocationMenu={showLocationMenu}
         setShowLocationMenu={setShowLocationMenu}
       />
-      <Hero searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+      <Hero
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+        setSelectedBrands={setSelectedBrands}
+      />
       <div className="grid grid-cols-5 grid-rows-5 gap-4">
         <div className="row-span-5">
           <Banner
@@ -128,13 +133,14 @@ const Home = () => {
             priceRange={priceRange}
             setPriceRange={setPriceRange}
             toggleBrand={toggleBrand}
-            activeFilters={activeFilters}
-            searchQuery={searchQuery}
-            setSearchQuery={setSearchQuery}
           />
         </div>
         <div className="col-span-4 row-span-5">
-          <FeacturedSections filteredCars={filteredCars} />
+          <FeacturedSections
+            filteredCars={filteredCars}
+            page={page}
+            setPage={setPage}
+          />
         </div>
       </div>
     </>

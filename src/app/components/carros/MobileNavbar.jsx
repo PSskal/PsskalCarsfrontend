@@ -3,6 +3,7 @@ import Link from "next/link";
 import { IoIosArrowDown } from "react-icons/io";
 import { FaUser } from "react-icons/fa";
 import { IoIosAdd } from "react-icons/io";
+import { useRef } from "react";
 
 function MobileNavbar({
   location,
@@ -11,7 +12,10 @@ function MobileNavbar({
   setShowLocationMenu,
   searchQuery,
   setSearchQuery,
+  setSelectedBrands,
 }) {
+  const inputRef = useRef(null);
+
   return (
     <nav className="bg-[#1b1b1b] shadow-xl fixed ring-gray-900/5 px-4 py-6  left-0 w-full z-50 animate-fade-in">
       <div className="flex flex-col gap-4">
@@ -21,19 +25,17 @@ function MobileNavbar({
           <div className="relative">
             <button
               className="text-white flex items-center gap-2 text-lg"
-              onClick={() => setShowLocationMenu(!showLocationMenu)}
+              onClick={() => {
+                setShowLocationMenu(!showLocationMenu);
+                setSelectedBrands(["All Brand"]);
+              }}
             >
-              <span>{location}</span>
+              <span>{location}, Peru</span>
               <IoIosArrowDown />
             </button>
             {showLocationMenu && (
               <div className="absolute left-0 mt-2 bg-black w-full rounded shadow-lg z-10">
-                {[
-                  "Lima, Perú",
-                  "Arequipa, Perú",
-                  "Cusco, Perú",
-                  "Chiclayo, Perú",
-                ].map((loc) => (
+                {["Lima", "Arequipa", "Cusco", "Chiclayo"].map((loc) => (
                   <button
                     key={loc}
                     className="flex items-center w-full px-4 py-2 text-white hover:bg-gray-100"
@@ -43,7 +45,7 @@ function MobileNavbar({
                     }}
                   >
                     <FaLocationDot className="mr-2" />
-                    {loc}
+                    {loc}, Peru
                   </button>
                 ))}
               </div>
@@ -55,13 +57,30 @@ function MobileNavbar({
         <div className="mb-4 ">
           <div className="flex">
             <input
+              ref={inputRef}
               type="text"
               placeholder="Find Car Here ..."
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                if (e.target.value.length > 0) {
+                  setSelectedBrands(["All Brand"]);
+                }
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.target.blur();
+                }
+              }}
               className="bg-white flex-1 px-4 py-3 rounded-l-lg border-0 focus:outline-none text-gray-700"
             />
-            <button className="bg-[#4375f7] px-4 py-3 rounded-r-lg hover:bg-blue-700 transition-colors">
+            <button
+              className="bg-[#4375f7] px-4 py-3 rounded-r-lg hover:bg-blue-700 transition-colors"
+              onClick={() => {
+                // Quita el foco del input para cerrar el teclado
+                inputRef.current && inputRef.current.blur();
+              }}
+            >
               <FaUser className="text-white text-lg" />
             </button>
           </div>

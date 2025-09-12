@@ -2,14 +2,48 @@ import React from "react";
 import Tittle from "./Tittle";
 import CarCard from "./CarCard";
 import { FaArrowRight } from "react-icons/fa";
-import Link from "next/link";
-import dummyCarData from "./carData";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 
-const FeacturedSections = ({ filteredCars }) => {
-  const carsToShow =
-    filteredCars && filteredCars.length > 0
-      ? filteredCars.slice(0, 6)
-      : dummyCarData.slice(0, 6);
+const FeacturedSections = ({ filteredCars, page, setPage }) => {
+  const cars = filteredCars && filteredCars.length > 0 ? filteredCars : [];
+  const itemsPerPage = 2;
+  const totalPages = Math.ceil(cars.length / itemsPerPage);
+  const carsToShow = cars.slice((page - 1) * itemsPerPage, page * itemsPerPage);
+
+  const handlePageChange = (newPage) => {
+    setPage(newPage);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  // Genera los links de paginación
+  const renderPaginationLinks = () => {
+    const links = [];
+    for (let i = 1; i <= totalPages; i++) {
+      links.push(
+        <PaginationItem key={i}>
+          <PaginationLink
+            href="#"
+            isActive={i === page}
+            onClick={(e) => {
+              e.preventDefault();
+              handlePageChange(i);
+            }}
+          >
+            {i}
+          </PaginationLink>
+        </PaginationItem>
+      );
+    }
+    return links;
+  };
 
   return (
     <div
@@ -22,11 +56,33 @@ const FeacturedSections = ({ filteredCars }) => {
           </div>
         ))}
       </div>
-      <Link href="/carros" scroll={true}>
-        <button className="flex items-center justify-center gap-2 px-6 py-2 border border-black hover:bg-gray-50 rounded-md mt-18 cursor-pointer">
-          Explore all Cars <FaArrowRight />
-        </button>
-      </Link>
+      {totalPages > 1 && (
+        <Pagination className="mt-8 text-black">
+          <PaginationContent>
+            <PaginationItem>
+              <PaginationPrevious
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (page > 1) handlePageChange(page - 1);
+                }}
+                aria-disabled={page === 1}
+              />
+            </PaginationItem>
+            {renderPaginationLinks()}
+            <PaginationItem>
+              <PaginationNext
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (page < totalPages) handlePageChange(page + 1);
+                }}
+                aria-disabled={page === totalPages}
+              />
+            </PaginationItem>
+          </PaginationContent>
+        </Pagination>
+      )}
     </div>
   );
 };

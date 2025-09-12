@@ -1,7 +1,12 @@
 "use client";
 import React, { useState } from "react";
 import { FaSearch, FaFilter, FaSlidersH } from "react-icons/fa";
-export default function Hero({ searchQuery, setSearchQuery }) {
+
+export default function Hero({
+  searchQuery,
+  setSearchQuery,
+  setSelectedBrands,
+}) {
   const [activeTab, setActiveTab] = useState("Buy Car");
   const [sortBy, setSortBy] = useState("Recommended");
 
@@ -21,7 +26,7 @@ export default function Hero({ searchQuery, setSearchQuery }) {
                   }`}
                   onClick={() => setActiveTab("Buy Car")}
                 >
-                  Buy Car
+                  Comprar
                 </button>
                 <button
                   className={`rounded-md px-4 py-2 font-medium ${
@@ -31,7 +36,7 @@ export default function Hero({ searchQuery, setSearchQuery }) {
                   }`}
                   onClick={() => setActiveTab("Rent Car")}
                 >
-                  Rent Car
+                  Financiamiento
                 </button>
               </div>
 
@@ -42,7 +47,13 @@ export default function Hero({ searchQuery, setSearchQuery }) {
                   placeholder="Encuentra tu auto aquí..."
                   className="pl-10 md:w-120 lg:w-160 py-2 rounded-md border border-gray-300 focus:outline-none"
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                    if (e.target.value.length > 0) {
+                      // Aquí debes reiniciar el filtro de marcas
+                      setSelectedBrands(["All Brand"]);
+                    }
+                  }}
                 />
               </div>
             </div>

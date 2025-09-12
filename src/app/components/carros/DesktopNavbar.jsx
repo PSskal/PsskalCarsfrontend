@@ -17,31 +17,26 @@ function DesktopNavbar({
           {/* Left side - Location selector */}
           <div className="relative">
             <button
-              className="text-white bg-[#363636] hover:bg-[#0f0e0e] flex items-center gap-2 px-3 py-2 rounded"
+              className="cursor-pointer text-white bg-[#363636] hover:bg-[#0f0e0e] flex items-center gap-2 px-3 py-2 rounded"
               onClick={() => setShowLocationMenu(!showLocationMenu)}
             >
               <FaLocationDot />
-              <span className="hidden sm:inline">{location}</span>
+              <span className="hidden sm:inline">{location}, Peru</span>
               <IoIosArrowDown />
             </button>
             {showLocationMenu && (
               <div className="absolute left-0 mt-2 w-56 bg-white rounded shadow-lg z-10">
-                {[
-                  "Lima, Perú",
-                  "Arequipa, Perú",
-                  "Cusco, Perú",
-                  "Chiclayo, Perú",
-                ].map((loc) => (
+                {["Lima", "Arequipa", "Cusco", "Trujillo"].map((loc) => (
                   <button
                     key={loc}
-                    className="flex items-center w-full px-4 py-2 text-gray-800 hover:bg-gray-100"
+                    className="flex items-center w-full px-4 py-2 text-gray-800 hover:bg-gray-100 cursor-pointer"
                     onClick={() => {
                       setLocation(loc);
                       setShowLocationMenu(false);
                     }}
                   >
                     <FaLocationDot className="mr-2" />
-                    {loc}
+                    {loc}, Peru
                   </button>
                 ))}
               </div>
@@ -57,10 +52,10 @@ function DesktopNavbar({
           {/* Right: Links y botón vender carro */}
           <div className="flex items-center gap-4">
             <Link
-              href="/contacto"
-              className="inline-flex items-center rounded-md border border-transparent bg-[#4375f7] px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-gray-900 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 ml-10"
+              href="/sell-car"
+              className="inline-flex items-center rounded-md border border-transparent bg-[#4375f7] px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-blue-900 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 ml-10"
             >
-              <IoIosAdd className="font-bold mr-2" />
+              <IoIosAdd className="font-bold mr-2 text-white text-2xl" />
               Vender Carro
             </Link>
           </div>

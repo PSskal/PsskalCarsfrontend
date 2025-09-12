@@ -108,7 +108,7 @@ export default function CarDetailsPage() {
               {[
                 {
                   icon: <BsPeopleFill />,
-                  text: `${car.seating_capacity} Seats`,
+                  text: `${car.color}`,
                 },
                 { icon: <BsFillFuelPumpFill />, text: car.fuel_type },
                 { icon: <FaCarAlt />, text: car.transmission },

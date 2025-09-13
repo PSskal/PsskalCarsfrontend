@@ -1,5 +1,5 @@
 import { Geist, Geist_Mono } from "next/font/google";
-import { CarContextProvider } from "@/context/CarContext";
+import { CarProvider } from "@/context/CarContext";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -23,7 +23,7 @@ export default function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <CarContextProvider>{children}</CarContextProvider>
+        <CarProvider>{children}</CarProvider>
       </body>
     </html>
   );

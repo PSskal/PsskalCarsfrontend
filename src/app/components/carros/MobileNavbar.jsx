@@ -1,26 +1,18 @@
 import { FaLocationDot } from "react-icons/fa6";
-import Link from "next/link";
 import { IoIosArrowDown } from "react-icons/io";
-import { FaUser } from "react-icons/fa";
-import { IoIosAdd } from "react-icons/io";
-import { useRef } from "react";
 
 function MobileNavbar({
   location,
   setLocation,
   showLocationMenu,
   setShowLocationMenu,
-  searchQuery,
-  setSearchQuery,
   setSelectedBrands,
 }) {
-  const inputRef = useRef(null);
-
   return (
-    <nav className="bg-[#1b1b1b] shadow-xl fixed ring-gray-900/5 px-4 py-6  left-0 w-full z-50 animate-fade-in">
-      <div className="flex flex-col gap-4">
+    <nav className="bg-[#1b1b1b] shadow-xl ring-gray-900/5 px-4 py-2 left-0 w-full z-50 animate-fade-in">
+      <div className="flex flex-col">
         {/* Location Section */}
-        <div className="mb-4">
+        <div>
           <div className="text-gray-400 text-sm mb-1">Location</div>
           <div className="relative">
             <button
@@ -54,45 +46,6 @@ function MobileNavbar({
         </div>
 
         {/* Search Bar */}
-        <div className="mb-4 ">
-          <div className="flex">
-            <input
-              ref={inputRef}
-              type="text"
-              placeholder="Find Car Here ..."
-              value={searchQuery}
-              onChange={(e) => {
-                setSearchQuery(e.target.value);
-                if (e.target.value.length > 0) {
-                  setSelectedBrands(["All Brand"]);
-                }
-              }}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  e.target.blur();
-                }
-              }}
-              className="bg-white flex-1 px-4 py-3 rounded-l-lg border-0 focus:outline-none text-gray-700"
-            />
-            <button
-              className="bg-[#4375f7] px-4 py-3 rounded-r-lg hover:bg-blue-700 transition-colors"
-              onClick={() => {
-                // Quita el foco del input para cerrar el teclado
-                inputRef.current && inputRef.current.blur();
-              }}
-            >
-              <FaUser className="text-white text-lg" />
-            </button>
-          </div>
-        </div>
-        {/* Sell Car Button */}
-        <Link
-          href="/sell-car "
-          className="w-full inline-flex items-center justify-center rounded-lg bg-[#4375f7] px-6 py-4 text-lg font-medium text-white shadow-sm hover:bg-blue-700 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-        >
-          <IoIosAdd className="font-bold mr-2 text-xl" />
-          Vender Carro
-        </Link>
       </div>
     </nav>
   );

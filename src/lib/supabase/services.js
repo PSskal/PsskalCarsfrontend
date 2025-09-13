@@ -66,4 +66,15 @@ export const carService = {
     }
     return data;
   },
+  async getImagesByCarId(carId) {
+    const { data, error } = await supabase
+      .from("car_images")
+      .select("*")
+      .eq("car_id", carId);
+    if (error) {
+      console.error("Error fetching images by car ID:", error);
+      return [];
+    }
+    return data;
+  },
 };

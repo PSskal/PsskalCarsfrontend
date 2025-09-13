@@ -1,16 +1,18 @@
 "use client";
-import { createContext, useContext } from "react";
-export const CarContext = createContext();
+import { createContext, useContext, useState } from "react";
 
-export const useCars = () => {
-  return useContext(CarContext);
-};
+const CarContext = createContext();
 
-// You can add a provider component here if needed
-export const CarContextProvider = ({ children }) => {
+export function CarProvider({ children }) {
+  const [cars, setCars] = useState([]);
+
   return (
-    <CarContext.Provider value={{ name: "Car Context" }}>
+    <CarContext.Provider value={{ cars, setCars }}>
       {children}
     </CarContext.Provider>
   );
-};
+}
+
+export function useCarContext() {
+  return useContext(CarContext);
+}

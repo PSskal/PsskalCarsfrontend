@@ -1,84 +1,57 @@
 "use client";
 import { useParams } from "next/navigation";
-import dummyCarData from "@/app/components/carros/carData";
+import { useCarContext } from "@/context/CarContext";
 import { useEffect, useState } from "react";
 import { FaArrowLeft } from "react-icons/fa";
-import { MdOutlineArrowBackIos } from "react-icons/md";
-import { MdArrowForwardIos } from "react-icons/md";
-import { BsPeopleFill } from "react-icons/bs";
-import { BsFillFuelPumpFill } from "react-icons/bs";
+import { BsPeopleFill, BsFillFuelPumpFill } from "react-icons/bs";
 import { FaCarAlt } from "react-icons/fa";
 import { MdLocationPin } from "react-icons/md";
 import Loader from "@/app/components/carros/Loader";
-
-function Carousel({ images }) {
-  const [current, setCurrent] = useState(0);
-
-  const prev = () =>
-    setCurrent((curr) => (curr === 0 ? images.length - 1 : curr - 1));
-  const next = () =>
-    setCurrent((curr) => (curr === images.length - 1 ? 0 : curr + 1));
-
-  return (
-    <div className="overflow-hidden relative w-full h-56 md:h-96 rounded-lg mb-6 bg-gray-100">
-      <div
-        className="flex transition-transform ease-out duration-700 h-full"
-        style={{ transform: `translateX(-${current * 100}%)` }}
-      >
-        {images.map((img, idx) => (
-          <img
-            key={idx}
-            src={img}
-            alt={`car-img-${idx}`}
-            className="w-full h-full object-cover flex-shrink-0"
-            style={{ minWidth: "100%", minHeight: "100%" }}
-          />
-        ))}
-      </div>
-      {/* Controls */}
-      <button
-        type="button"
-        className="absolute top-1/2 left-4 -translate-y-1/2 z-30 bg-white/30 rounded-full p-2 hover:bg-orange-400 hover:text-white transition-colors"
-        onClick={prev}
-        aria-label="Previous"
-      >
-        <MdOutlineArrowBackIos />
-      </button>
-      <button
-        type="button"
-        className="absolute top-1/2 right-4 -translate-y-1/2 z-30 bg-white/30 rounded-full p-2 hover:bg-orange-400 hover:text-white transition-colors"
-        onClick={next}
-        aria-label="Next"
-      >
-        <MdArrowForwardIos />
-      </button>
-      {/* Indicators */}
-      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
-        {images.map((_, idx) => (
-          <button
-            key={idx}
-            className={`w-3 h-3 rounded-full transition-all ${
-              idx === current
-                ? "bg-orange-400 p-2"
-                : "bg-gray-300 bg-opacity-50"
-            }`}
-            onClick={() => setCurrent(idx)}
-            aria-label={`Go to slide ${idx + 1}`}
-          />
-        ))}
-      </div>
-    </div>
-  );
-}
+import { carService } from "@/lib/supabase/services";
+import Image from "next/image";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 
 export default function CarDetailsPage() {
   const { id } = useParams();
-
+  const { cars } = useCarContext();
   const [car, setCar] = useState(null);
+  const [images, setImages] = useState([]);
+  const { getImagesByCarId, getCarById } = carService;
 
   useEffect(() => {
-    setCar(dummyCarData.find((c) => String(c.id) === String(id)));
-  }, [id]);
+    const fetchData = async () => {
+      let found = cars.find((c) => c.id === id);
+      let carData = found;
+      if (!found) {
+        carData = await getCarById(id);
+      }
+      setCar(carData);
+
+      const carImages = await getImagesByCarId(id);
+      let imageUrls = Array.isArray(carImages)
+        ? carImages.map((img) => img.image_url)
+        : [];
+
+      if (carData?.image && !imageUrls.includes(carData.image)) {
+        imageUrls = [carData.image, ...imageUrls];
+      } else if (carData?.image) {
+        imageUrls = [
+          carData.image,
+          ...imageUrls.filter((url) => url !== carData.image),
+        ];
+      }
+
+      setImages(imageUrls);
+    };
+
+    fetchData();
+  }, [id, cars]);
 
   return car ? (
     <div data-scroll-section className="px-6 md:px-16 lg:px-24 xl:px-32 mt-4">
@@ -86,15 +59,35 @@ export default function CarDetailsPage() {
         className="flex items-center gap-2 mb-6 text-gray-500 cursor-pointer hover:text-gray-700"
         onClick={() => window.history.back()}
       >
-        <FaArrowLeft />
-        Back to all Cars
+        <FaArrowLeft /> Back to all Cars
       </button>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
-        {/* lef car image */}
+        {/* left car image */}
         <div className="lg:col-span-2">
-          <Carousel images={car.images || [car.image]} />
-          <div className="space-y-6">
+          {/* Carrusel */}
+          <div className="relative w-full aspect-[16/9] rounded-lg mb-8 bg-gray-100">
+            <Carousel className="overflow-hidden relative w-full  rounded-lg mb-8 bg-gray-100">
+              <CarouselContent className="h-full">
+                {images.map((img, idx) => (
+                  <CarouselItem key={idx} className="flex h-full">
+                    <Image
+                      src={img}
+                      alt={`car-img-${idx}`}
+                      className="w-full h-full object-cover flex-shrink-0"
+                      width={400}
+                      height={192}
+                    />
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+              <CarouselPrevious className="cursor-pointer absolute top-1/2 left-4 -translate-y-1/2 z-30 bg-white/30 rounded-full p-2 hover:bg-orange-400 hover:text-white transition-colors" />
+              <CarouselNext className="cursor-pointer absolute top-1/2 right-4 -translate-y-1/2 z-30 bg-white/30 rounded-full p-2 hover:bg-orange-400 hover:text-white transition-colors" />
+            </Carousel>
+          </div>
+
+          {/* Datos del auto */}
+          <div className="space-y-6 mt-6">
             <div>
               <h1 className="text-3xl font-bold">
                 {car.brand} {car.model}

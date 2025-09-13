@@ -8,6 +8,10 @@ import DesktopNavbar from "@/app/components/carros/DesktopNavbar";
 import MobileNavbar from "@/app/components/carros/MobileNavbar";
 import { carService } from "@/lib/supabase/services";
 import { useIsMobile } from "@/app/hooks/useIsMobile";
+import { useCarContext } from "@/context/CarContext";
+import Link from "next/link";
+import SearchBar from "./components/carros/SearchBar";
+import SellCarButton from "./components/carros/SellCarButton";
 
 const Home = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -18,7 +22,7 @@ const Home = () => {
   const [location, setLocation] = useState("Lima");
   const [showLocationMenu, setShowLocationMenu] = useState(false);
   const [mounted, setMounted] = useState(false);
-  const [cars, setCars] = useState([]);
+  const { cars, setCars } = useCarContext();
   const [page, setPage] = useState(1);
   const isMobile = useIsMobile();
 
@@ -27,7 +31,6 @@ const Home = () => {
   async function fetchCars() {
     const cars = await getCarByLocation(location);
     setCars(cars);
-    console.log(cars);
     return cars;
   }
 
@@ -38,10 +41,7 @@ const Home = () => {
   useEffect(() => {
     fetchCars();
     setPage(1); // <-- Resetea la página
-    console.log(location);
   }, [location]);
-
-  // console.log("Selected Brands:", selectedBrands);
 
   // Luego aplicar los demás filtros sobre ese resultado
   const filteredCars = cars.filter((car) => {
@@ -72,29 +72,37 @@ const Home = () => {
       setSelectedBrands([brand]);
     }
   };
-  // console.log(selectedBrands);
 
   if (!mounted) return null;
 
   return isMobile ? (
     <div>
-      <div className="relative">
-        <MobileNavbar
-          location={location}
-          setLocation={setLocation}
-          showLocationMenu={showLocationMenu}
-          setShowLocationMenu={setShowLocationMenu}
-          searchQuery={searchQuery}
-          setSearchQuery={setSearchQuery}
-          setSelectedBrands={setSelectedBrands}
-        />
-        <BrandScrollHorizontal toggleBrand={toggleBrand} />
-        <FeacturedSections
-          filteredCars={filteredCars}
-          page={page}
-          setPage={setPage}
-        />
-      </div>
+      <MobileNavbar
+        location={location}
+        setLocation={setLocation}
+        showLocationMenu={showLocationMenu}
+        setShowLocationMenu={setShowLocationMenu}
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+        setSelectedBrands={setSelectedBrands}
+      />
+
+      <SearchBar
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+        setSelectedBrands={setSelectedBrands}
+      />
+      <SellCarButton />
+
+      <BrandScrollHorizontal
+        toggleBrand={toggleBrand}
+        setSearchQuery={setSearchQuery}
+      />
+      <FeacturedSections
+        filteredCars={filteredCars}
+        page={page}
+        setPage={setPage}
+      />
     </div>
   ) : (
     <>

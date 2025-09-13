@@ -5,6 +5,7 @@ import { BsPeopleFill } from "react-icons/bs";
 import { BsFillFuelPumpFill } from "react-icons/bs";
 import { FaCarAlt } from "react-icons/fa";
 import { MdLocationPin } from "react-icons/md";
+import Image from "next/image";
 
 const CarCard = ({ car }) => {
   const router = useRouter();
@@ -17,10 +18,12 @@ const CarCard = ({ car }) => {
       className="group rounded-xl overflow-hidden shadow-lg hover:-translate-y-1 transition-all duration-500 cursor-pointer"
     >
       <div className="relative h-48 overflow-hidden">
-        <img
+        <Image
           src={car.image}
           alt={car.model}
           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+          width={400}
+          height={192}
         />
         {car.isAvailable && (
           <p className="absolute top-4 left-4 bg-blue-800 text-white text-xs px-2.5 py-1 rounded-full">

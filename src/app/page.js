@@ -6,12 +6,12 @@ import FeacturedSections from "@/app/components/carros/FeacturedSections";
 import BrandScrollHorizontal from "@/app/components/carros/BrandScrollHorizontal";
 import DesktopNavbar from "@/app/components/carros/DesktopNavbar";
 import MobileNavbar from "@/app/components/carros/MobileNavbar";
+import SearchBar from "./components/carros/SearchBar";
+import SellCarButton from "./components/carros/SellCarButton";
+import FeacturedSectionsMobile from "./components/carros/FeacturedSectionsMobile";
 import { carService } from "@/lib/supabase/services";
 import { useIsMobile } from "@/app/hooks/useIsMobile";
 import { useCarContext } from "@/context/CarContext";
-import Link from "next/link";
-import SearchBar from "./components/carros/SearchBar";
-import SellCarButton from "./components/carros/SellCarButton";
 
 const Home = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -98,7 +98,7 @@ const Home = () => {
         toggleBrand={toggleBrand}
         setSearchQuery={setSearchQuery}
       />
-      <FeacturedSections
+      <FeacturedSectionsMobile
         filteredCars={filteredCars}
         page={page}
         setPage={setPage}

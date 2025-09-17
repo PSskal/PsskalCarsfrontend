@@ -5,6 +5,8 @@ const dummyCarData = [
     model: "Corolla",
     year: 2022,
     category: "Sedan",
+    image:
+      "https://cdn.sanity.io/images/90qxor39/production/d727bb2e9d8a075a43772a0080e0344a2aa72f04-800x450.jpg?q=75&fit=max&auto=format&dpr=2",
     images: [
       "https://cdn.sanity.io/images/90qxor39/production/d727bb2e9d8a075a43772a0080e0344a2aa72f04-800x450.jpg?q=75&fit=max&auto=format&dpr=2",
       "https://ecoloauto.com/?attachment_id=41879",

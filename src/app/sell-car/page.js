@@ -1,18 +1,18 @@
 "use client";
 import { useState } from "react";
+import { Button } from "@/components/ui/button";
+
 import {
   ChevronLeft,
   ChevronRight,
   Car,
   Camera,
-  DollarSign,
   Phone,
   Eye,
   Check,
 } from "lucide-react";
 import VehicleDetailsStep from "@/app/components/sell-car/VehicleDetailsStep";
 import PhotoUploadStep from "@/app/components/sell-car/PhotoUploadStep";
-import PricingStep from "@/app/components/sell-car/PricingStep";
 import ContactStep from "@/app/components/sell-car/ContactStep";
 import ListingPreview from "@/app/components/sell-car/ListingPreview";
 
@@ -44,34 +44,29 @@ const SellCar = () => {
   const steps = [
     {
       id: 1,
-      title: "Detalles del Vehículo",
+      title: "Detalles",
       icon: Car,
       description: "Información básica de tu vehículo",
     },
+
     {
       id: 2,
-      title: "Fotos",
-      icon: Camera,
-      description: "Imágenes de alta calidad",
-    },
-    {
-      id: 3,
-      title: "Precio",
-      icon: DollarSign,
-      description: "Establece tu precio de venta",
-    },
-    {
-      id: 4,
-      title: "Contacto",
+      title: "Preferencia",
       icon: Phone,
       description: "Preferencias de comunicación",
     },
     {
-      id: 5,
-      title: "Vista Previa",
-      icon: Eye,
-      description: "Revisa antes de publicar",
+      id: 3,
+      title: "Fotos",
+      icon: Camera,
+      description: "Imágenes de alta calidad",
     },
+    // {
+    //   id: 4,
+    //   title: "Vista Previa",
+    //   icon: Eye,
+    //   description: "Revisa antes de publicar",
+    // },
   ];
 
   const updateFormData = (section, data) => {
@@ -104,28 +99,21 @@ const SellCar = () => {
         );
       case 2:
         return (
-          <PhotoUploadStep
-            data={formData?.photos}
-            onUpdate={(data) => updateFormData("photos", data)}
-          />
-        );
-      case 3:
-        return (
-          <PricingStep
-            data={formData?.pricing}
-            onUpdate={(data) => updateFormData("pricing", data)}
-            vehicleData={formData?.vehicleDetails}
-          />
-        );
-      case 4:
-        return (
           <ContactStep
             data={formData?.contact}
             onUpdate={(data) => updateFormData("contact", data)}
           />
         );
-      case 5:
-        return <ListingPreview data={formData} />;
+      case 3:
+        return (
+          <PhotoUploadStep
+            data={formData?.photos}
+            onUpdate={(data) => updateFormData("photos", data)}
+          />
+        );
+
+      // case 4:
+      //   return <ListingPreview data={formData} />;
       default:
         return null;
     }
@@ -161,7 +149,7 @@ const SellCar = () => {
                     <div
                       className={`w-12 h-12 rounded-full flex items-center justify-center border-2 ${
                         isCompleted
-                          ? "bg-green-600 border-green-600 text-white"
+                          ? "bg-blue-900 border-blue-900 text-white"
                           : isCurrent
                           ? "bg-blue-600 border-blue-600 text-white"
                           : "bg-white border-gray-300 text-gray-400"
@@ -179,7 +167,7 @@ const SellCar = () => {
                           isCurrent
                             ? "text-blue-600"
                             : isCompleted
-                            ? "text-green-600"
+                            ? "text-blue-900"
                             : "text-gray-500"
                         }`}
                       >
@@ -193,7 +181,7 @@ const SellCar = () => {
                   {index < steps?.length - 1 && (
                     <div
                       className={`flex-1 h-0.5 mx-4 ${
-                        currentStep > step?.id ? "bg-green-600" : "bg-gray-300"
+                        currentStep > step?.id ? "bg-blue-900" : "bg-gray-300"
                       }`}
                     />
                   )}
@@ -211,7 +199,7 @@ const SellCar = () => {
 
         {/* Navigation */}
         <div className="flex justify-between mt-8">
-          <button
+          <Button
             variant="outline"
             onClick={prevStep}
             disabled={currentStep === 1}
@@ -219,17 +207,17 @@ const SellCar = () => {
           >
             <ChevronLeft className="w-4 h-4" />
             <span>Anterior</span>
-          </button>
+          </Button>
 
-          {currentStep < 5 ? (
-            <button onClick={nextStep} className="flex items-center space-x-2">
+          {currentStep < 3 ? (
+            <Button onClick={nextStep} className="flex items-center space-x-2">
               <span>Siguiente</span>
               <ChevronRight className="w-4 h-4" />
-            </button>
+            </Button>
           ) : (
-            <button className="bg-green-600 hover:bg-green-700">
+            <Button className="bg-blue-600 hover:bg-blue-700">
               Publicar Anuncio
-            </button>
+            </Button>
           )}
         </div>
       </div>

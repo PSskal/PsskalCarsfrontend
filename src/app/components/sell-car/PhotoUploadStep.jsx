@@ -1,5 +1,7 @@
 import React, { useState, useCallback } from "react";
 import { Upload, X, Camera, Image as ImageIcon, RotateCw } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 const PhotoUploadStep = ({ data, onUpdate }) => {
   const [dragActive, setDragActive] = useState(false);
@@ -78,7 +80,7 @@ const PhotoUploadStep = ({ data, onUpdate }) => {
   };
 
   const photos = data || [];
-  const maxPhotos = 20;
+  const maxPhotos = 5;
 
   return (
     <div className="p-8">
@@ -117,7 +119,7 @@ const PhotoUploadStep = ({ data, onUpdate }) => {
               </p>
             </div>
             <div className="flex space-x-4">
-              <button
+              <Button
                 variant="outline"
                 onClick={() => document.getElementById("file-input")?.click()}
                 disabled={uploading}
@@ -125,8 +127,8 @@ const PhotoUploadStep = ({ data, onUpdate }) => {
               >
                 <ImageIcon className="w-4 h-4" />
                 <span>Seleccionar Fotos</span>
-              </button>
-              <button
+              </Button>
+              <Button
                 variant="outline"
                 onClick={() => document.getElementById("camera-input")?.click()}
                 disabled={uploading}
@@ -134,11 +136,11 @@ const PhotoUploadStep = ({ data, onUpdate }) => {
               >
                 <Camera className="w-4 h-4" />
                 <span>Tomar Foto</span>
-              </button>
+              </Button>
             </div>
           </div>
 
-          <input
+          <Input
             id="file-input"
             type="file"
             multiple
@@ -147,7 +149,7 @@ const PhotoUploadStep = ({ data, onUpdate }) => {
             onChange={(e) => handleFiles(e?.target?.files)}
           />
 
-          <input
+          <Input
             id="camera-input"
             type="file"
             accept="image/*"
@@ -200,32 +202,24 @@ const PhotoUploadStep = ({ data, onUpdate }) => {
                   </div>
                 )}
 
-                {/* 360 Badge */}
-                {photo?.is360 && (
-                  <div className="absolute top-2 right-2 bg-green-600 text-white text-xs px-2 py-1 rounded flex items-center space-x-1">
-                    <RotateCw className="w-3 h-3" />
-                    <span>360°</span>
-                  </div>
-                )}
-
                 {/* Overlay Controls */}
                 <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all duration-200 flex items-center justify-center space-x-2">
-                  <button
+                  <Button
                     size="sm"
                     variant="outline"
                     className="opacity-0 group-hover:opacity-100 transition-opacity bg-white text-gray-900 hover:bg-gray-100"
                     onClick={() => toggle360View(photo?.id)}
                   >
                     <RotateCw className="w-4 h-4" />
-                  </button>
-                  <button
+                  </Button>
+                  <Button
                     size="sm"
                     variant="outline"
                     className="opacity-0 group-hover:opacity-100 transition-opacity bg-white text-red-600 hover:bg-red-50"
                     onClick={() => removePhoto(photo?.id)}
                   >
                     <X className="w-4 h-4" />
-                  </button>
+                  </Button>
                 </div>
               </div>
             ))}

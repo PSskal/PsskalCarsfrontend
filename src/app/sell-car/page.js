@@ -8,38 +8,42 @@ import {
   Car,
   Camera,
   Phone,
-  Eye,
   Check,
 } from "lucide-react";
 import VehicleDetailsStep from "@/app/components/sell-car/VehicleDetailsStep";
 import PhotoUploadStep from "@/app/components/sell-car/PhotoUploadStep";
 import ContactStep from "@/app/components/sell-car/ContactStep";
-import ListingPreview from "@/app/components/sell-car/ListingPreview";
+import { carService } from "@/lib/supabase/services";
+
+const getInitialFormState = () => ({
+  vehicleDetails: {
+    make: "",
+    model: "",
+    year: "",
+    mileage: "",
+    condition: "",
+    features: [],
+    category: "",
+    color: "",
+    fuel_type: "",
+    transmission: "",
+    traction: "",
+  },
+  contact: {
+    phone: "",
+    currency: "USD",
+    askingPrice: "",
+    location: "",
+    additionalInfo: "",
+  },
+  photos: [],
+});
 
 const SellCar = () => {
   const [currentStep, setCurrentStep] = useState(1);
-  const [formData, setFormData] = useState({
-    vehicleDetails: {
-      make: "",
-      model: "",
-      year: "",
-      mileage: "",
-      condition: "",
-      features: [],
-    },
-    photos: [],
-    pricing: {
-      askingPrice: "",
-      marketValue: "",
-      negotiable: false,
-      financeOptions: false,
-    },
-    contact: {
-      method: "phone",
-      responseTime: "24hours",
-      availability: "weekdays",
-    },
-  });
+  const [formData, setFormData] = useState(getInitialFormState());
+  const [status, setStatus] = useState({ type: null, message: "" });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const steps = [
     {
@@ -61,23 +65,23 @@ const SellCar = () => {
       icon: Camera,
       description: "Imágenes de alta calidad",
     },
-    // {
-    //   id: 4,
-    //   title: "Vista Previa",
-    //   icon: Eye,
-    //   description: "Revisa antes de publicar",
-    // },
   ];
 
   const updateFormData = (section, data) => {
     setFormData((prev) => ({
       ...prev,
-      [section]: { ...prev?.[section], ...data },
+      [section]: Array.isArray(data)
+        ? data
+        : { ...prev?.[section], ...data },
     }));
+
+    if (status.type) {
+      setStatus({ type: null, message: "" });
+    }
   };
 
   const nextStep = () => {
-    if (currentStep < 5) {
+    if (currentStep < steps.length) {
       setCurrentStep((prev) => prev + 1);
     }
   };
@@ -111,11 +115,119 @@ const SellCar = () => {
             onUpdate={(data) => updateFormData("photos", data)}
           />
         );
-
-      // case 4:
-      //   return <ListingPreview data={formData} />;
       default:
         return null;
+    }
+  };
+
+  const handleSubmit = async () => {
+    const { vehicleDetails, contact, photos } = formData;
+
+    const validations = [
+      { isValid: !!vehicleDetails.make, label: "Marca", step: 1 },
+      { isValid: !!vehicleDetails.model, label: "Modelo", step: 1 },
+      { isValid: !!vehicleDetails.year, label: "Año", step: 1 },
+      { isValid: !!vehicleDetails.category, label: "Categoría", step: 1 },
+      { isValid: !!vehicleDetails.fuel_type, label: "Tipo de combustible", step: 1 },
+      { isValid: !!vehicleDetails.transmission, label: "Transmisión", step: 1 },
+      { isValid: !!vehicleDetails.traction, label: "Tracción", step: 1 },
+      { isValid: !!vehicleDetails.color, label: "Color", step: 1 },
+      { isValid: !!vehicleDetails.mileage, label: "Kilometraje", step: 1 },
+      { isValid: !!contact.phone, label: "Teléfono de contacto", step: 2 },
+      { isValid: !!contact.askingPrice, label: "Precio de venta", step: 2 },
+      { isValid: !!contact.location, label: "Ubicación", step: 2 },
+      { isValid: photos?.length > 0, label: "Al menos una foto", step: 3 },
+    ];
+
+    const missing = validations.filter((item) => !item.isValid);
+
+    if (missing.length) {
+      const firstMissingStep = missing[0].step;
+      if (currentStep !== firstMissingStep) {
+        setCurrentStep(firstMissingStep);
+      }
+
+      const labels = missing.map((item) => item.label).join(", ");
+      setStatus({
+        type: "error",
+        message: `Completa los siguientes campos: ${labels}.`,
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    let uploadedUrls = [];
+    try {
+      uploadedUrls = await carService.uploadCarImages(photos);
+    } catch (uploadError) {
+      console.error("Failed to upload car images:", uploadError);
+      setStatus({
+        type: "error",
+        message: "No se pudieron subir las fotos. Inténtalo nuevamente.",
+      });
+      setIsSubmitting(false);
+      return;
+    }
+
+    if (!uploadedUrls.length) {
+      setStatus({
+        type: "error",
+        message: "No se generaron enlaces para las fotos. Verifica el bucket carimages.",
+      });
+      setIsSubmitting(false);
+      return;
+    }
+
+    const year = Number(vehicleDetails.year);
+    const mileage = Number(vehicleDetails.mileage);
+    const price = Number(contact.askingPrice);
+    const primaryImage = uploadedUrls[0];
+
+    const carPayload = {
+      brand: vehicleDetails.make,
+      model: vehicleDetails.model,
+      year: Number.isNaN(year) ? undefined : year,
+      category: vehicleDetails.category,
+      image: primaryImage,
+      price: Number.isNaN(price) ? undefined : price,
+      currency: contact.currency || "USD",
+      is_available: true,
+      mileage: Number.isNaN(mileage) ? undefined : mileage,
+      color: vehicleDetails.color,
+      fuel_type: vehicleDetails.fuel_type,
+      transmission: vehicleDetails.transmission,
+      drive_type: vehicleDetails.traction,
+      location: contact.location,
+      description: contact.additionalInfo || "",
+      contact_phone: contact.phone,
+    };
+
+    const sanitizedPayload = Object.fromEntries(
+      Object.entries(carPayload).filter(([, value]) => {
+        if (typeof value === "number") {
+          return !Number.isNaN(value);
+        }
+        return value !== undefined && value !== null && value !== "";
+      })
+    );
+
+    try {
+      await carService.createCarListing(sanitizedPayload, uploadedUrls);
+      setStatus({
+        type: "success",
+        message: "Tu anuncio se publicó correctamente.",
+      });
+      setFormData(getInitialFormState());
+      setCurrentStep(1);
+    } catch (error) {
+      console.error("Failed to create car listing:", error);
+      setStatus({
+        type: "error",
+        message: "No se pudo publicar el anuncio. Inténtalo nuevamente.",
+      });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -193,6 +305,17 @@ const SellCar = () => {
       </div>
       {/* Main Content */}
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {status.message && (
+          <div
+            className={`mb-6 rounded-md border px-4 py-3 text-sm ${
+              status.type === "error"
+                ? "border-red-200 bg-red-50 text-red-700"
+                : "border-green-200 bg-green-50 text-green-700"
+            }`}
+          >
+            {status.message}
+          </div>
+        )}
         <div className="bg-white rounded-lg shadow-sm border">
           {renderStepContent()}
         </div>
@@ -202,21 +325,29 @@ const SellCar = () => {
           <Button
             variant="outline"
             onClick={prevStep}
-            disabled={currentStep === 1}
+            disabled={currentStep === 1 || isSubmitting}
             className="flex items-center space-x-2"
           >
             <ChevronLeft className="w-4 h-4" />
             <span>Anterior</span>
           </Button>
 
-          {currentStep < 3 ? (
-            <Button onClick={nextStep} className="flex items-center space-x-2">
+          {currentStep < steps.length ? (
+            <Button
+              onClick={nextStep}
+              className="flex items-center space-x-2"
+              disabled={isSubmitting}
+            >
               <span>Siguiente</span>
               <ChevronRight className="w-4 h-4" />
             </Button>
           ) : (
-            <Button className="bg-blue-600 hover:bg-blue-700">
-              Publicar Anuncio
+            <Button
+              className="bg-blue-600 hover:bg-blue-700"
+              onClick={handleSubmit}
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? "Publicando..." : "Publicar Anuncio"}
             </Button>
           )}
         </div>

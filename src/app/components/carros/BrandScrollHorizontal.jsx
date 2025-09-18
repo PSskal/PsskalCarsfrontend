@@ -3,7 +3,7 @@ import brands from "./carBrands";
 
 const BrandScrollHorizontal = ({ toggleBrand, setSearchQuery }) => {
   return (
-    <div className="w-full py-2 pt-7">
+    <div className="w-full py-2 pt-7 z-10">
       <h3 className="text-lg font-semibold mb-4 px-4">Buscar por marcas</h3>
       <div className="flex overflow-x-auto gap-2 px-1 snap-x snap-mandatory scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
         {brands.map((brand) => (

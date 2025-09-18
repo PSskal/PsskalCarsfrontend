@@ -26,7 +26,7 @@ function MobileNavbar({
               <IoIosArrowDown />
             </button>
             {showLocationMenu && (
-              <div className="absolute left-0 mt-2 bg-black w-full rounded shadow-lg z-10">
+              <div className="absolute left-0 mt-2 bg-black w-full rounded shadow-lg z-60">
                 {["Lima", "Arequipa", "Cusco", "Chiclayo"].map((loc) => (
                   <button
                     key={loc}

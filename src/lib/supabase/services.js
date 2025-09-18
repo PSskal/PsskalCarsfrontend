@@ -1,5 +1,23 @@
 import { supabase } from "./server.js"; // Usa client.js para el cliente
 
+const generateUniquePath = (index = 0, extension = "") => {
+  const globalCrypto =
+    typeof globalThis !== "undefined" ? globalThis.crypto : undefined;
+  const baseId =
+    globalCrypto && typeof globalCrypto.randomUUID === "function"
+      ? globalCrypto.randomUUID()
+      : `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+  return `cars/${baseId}-${index}${extension ? `.${extension}` : ""}`;
+};
+
+const getFileExtension = (file) => {
+  if (!file) return "";
+  const fromName = file.name?.split?.(".")?.pop?.();
+  if (fromName && fromName !== file.name) return fromName;
+  const fromType = file.type?.split?.("/")?.pop?.();
+  return fromType || "jpg";
+};
+
 export const carService = {
   async getCars() {
     const { data, error } = await supabase.from("cars").select("*");
@@ -76,5 +94,81 @@ export const carService = {
       return [];
     }
     return data;
+  },
+
+  async uploadCarImages(photos = []) {
+    if (!Array.isArray(photos) || !photos.length) return [];
+
+    const bucket = "carimages";
+    const uploads = await Promise.all(
+      photos.map(async (photo, index) => {
+        if (photo?.remoteUrl) return photo.remoteUrl;
+        if (!photo?.file) {
+          if (typeof photo?.url === "string" && photo.url.startsWith("http")) {
+            return photo.url;
+          }
+          return null;
+        }
+
+        const extension = getFileExtension(photo.file);
+        const filePath = generateUniquePath(index, extension);
+        const { error: uploadError } = await supabase.storage
+          .from(bucket)
+          .upload(filePath, photo.file, {
+            cacheControl: "3600",
+            upsert: false,
+          });
+
+        if (uploadError) {
+          throw uploadError;
+        }
+
+        const {
+          data: { publicUrl },
+        } = supabase.storage.from(bucket).getPublicUrl(filePath);
+
+        return publicUrl || null;
+      })
+    );
+
+    return uploads.filter(Boolean);
+  },
+
+  async createCarListing(carPayload, imageUrls = []) {
+    try {
+      const { data: insertedCar, error } = await supabase
+        .from("cars")
+        .insert([carPayload])
+        .select()
+        .single();
+
+      if (error) {
+        throw error;
+      }
+
+      const sanitizedImageUrls = Array.isArray(imageUrls)
+        ? imageUrls.filter(Boolean)
+        : [];
+
+      if (sanitizedImageUrls.length) {
+        const imagesPayload = sanitizedImageUrls.map((url) => ({
+          car_id: insertedCar.id,
+          image_url: url,
+        }));
+
+        const { error: imageError } = await supabase
+          .from("car_images")
+          .insert(imagesPayload);
+
+        if (imageError) {
+          console.error("Error inserting car images:", imageError);
+        }
+      }
+
+      return insertedCar;
+    } catch (err) {
+      console.error("Error creating car listing:", err);
+      throw err;
+    }
   },
 };

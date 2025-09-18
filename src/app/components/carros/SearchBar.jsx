@@ -6,7 +6,7 @@ const SearchBar = ({ searchQuery, setSearchQuery, setSelectedBrands }) => {
   const inputRef = useRef(null);
 
   return (
-    <div className=" sticky top-0 z-50 bg-[#1b1b1b] p-4">
+    <div className=" sticky top-0 z-40 bg-[#1b1b1b] p-4">
       <div className="flex">
         <input
           ref={inputRef}

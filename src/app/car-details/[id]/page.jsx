@@ -26,14 +26,24 @@ export default function CarDetailsPage() {
 
   useEffect(() => {
     const fetchData = async () => {
-      let found = cars.find((c) => c.id === id);
+      if (!id) return;
+
+      const numericId = Number(id);
+      const carId = Number.isNaN(numericId) ? id : numericId;
+
+      let found = cars.find((c) => c.id === carId);
+      // Si no se encuentra por coincidencia estricta, intentar con conversión a cadena
+      if (!found) {
+        found = cars.find((c) => String(c.id) === String(id));
+      }
+
       let carData = found;
       if (!found) {
-        carData = await getCarById(id);
+        carData = await getCarById(carId);
       }
       setCar(carData);
 
-      const carImages = await getImagesByCarId(id);
+      const carImages = await getImagesByCarId(carId);
       let imageUrls = Array.isArray(carImages)
         ? carImages.map((img) => img.image_url)
         : [];

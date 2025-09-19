@@ -19,10 +19,17 @@ const Home = () => {
   const [carType, setCarType] = useState("New Car");
   const [selectedBrands, setSelectedBrands] = useState(["All Brand"]);
   const [priceRange, setPriceRange] = useState([100, 150000]);
-  const [location, setLocation] = useState("Lima");
+
   const [showLocationMenu, setShowLocationMenu] = useState(false);
   const [mounted, setMounted] = useState(false);
-  const { cars, setCars } = useCarContext();
+  const {
+    cars,
+    setCars,
+    location,
+    setLocation,
+    lastFetchedLocation,
+    setLastFetchedLocation,
+  } = useCarContext();
   const [page, setPage] = useState(1);
   const isMobile = useIsMobile();
 
@@ -31,6 +38,7 @@ const Home = () => {
   async function fetchCars() {
     const cars = await getCarByLocation(location);
     setCars(cars);
+    setLastFetchedLocation(location);
     return cars;
   }
 
@@ -39,9 +47,13 @@ const Home = () => {
   }, []);
 
   useEffect(() => {
-    fetchCars();
-    setPage(1); // <-- Resetea la página
+    // Si no hay autos cacheados o cambió la ubicación desde el último fetch, recargar
+    if (!cars || cars.length === 0 || lastFetchedLocation !== location) {
+      fetchCars();
+      setPage(1);
+    }
   }, [location]);
+  console.log(location);
 
   // Luego aplicar los demás filtros sobre ese resultado
   const filteredCars = cars.filter((car) => {

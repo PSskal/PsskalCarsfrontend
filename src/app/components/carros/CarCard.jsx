@@ -25,14 +25,30 @@ const CarCard = ({ car }) => {
           width={400}
           height={192}
         />
-        {car.isAvailable && (
+        {car.is_available && (
           <p className="absolute top-4 left-4 bg-blue-800 text-white text-xs px-2.5 py-1 rounded-full">
-            Available Now
+            Disponible Ahora
           </p>
         )}
 
-        <div className="absolute bottom-4 right-4 bg-black/80 backdrop-blur-sm text-white px-3 py-2 rounded-lg">
-          <span className="font-semibold">${car.price}</span>
+        <div className="absolute bottom-4 right-4 flex flex-col items-end gap-1">
+          <div className="bg-black/80 backdrop-blur-sm text-white px-3 py-2 rounded-lg">
+            <span className="font-bold">
+              ${car.price.toLocaleString("es-PE")}
+            </span>
+          </div>
+          {car.posted_at && (
+            <span className="text-xs text-gray-200 bg-black/60 rounded px-2 py-0.5 mt-1">
+              {`Publicado: ${new Date(car.posted_at).toLocaleDateString(
+                "es-PE",
+                {
+                  day: "2-digit",
+                  month: "2-digit",
+                  year: "numeric",
+                }
+              )}`}
+            </span>
+          )}
         </div>
       </div>
 

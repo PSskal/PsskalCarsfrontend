@@ -1,12 +1,16 @@
 "use client";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useCarContext } from "@/context/CarContext";
 import { useEffect, useState } from "react";
 import { FaArrowLeft } from "react-icons/fa";
 import { BsPeopleFill, BsFillFuelPumpFill } from "react-icons/bs";
 import { FaCarAlt } from "react-icons/fa";
+import { FaRegCalendarTimes } from "react-icons/fa";
 import { MdLocationPin } from "react-icons/md";
 import Loader from "@/app/components/carros/Loader";
+import { IoIosColorFill } from "react-icons/io";
+import { VscSymbolProperty } from "react-icons/vsc";
+import { TbCategoryFilled } from "react-icons/tb";
 import { carService } from "@/lib/supabase/services";
 import Image from "next/image";
 import {
@@ -20,6 +24,7 @@ import { Button } from "@/components/ui/button";
 
 export default function CarDetailsPage() {
   const { id } = useParams();
+  const router = useRouter();
   const { cars } = useCarContext();
   const [car, setCar] = useState(null);
   const [images, setImages] = useState([]);
@@ -65,27 +70,26 @@ export default function CarDetailsPage() {
   }, [id, cars]);
 
   return car ? (
-    <div data-scroll-section className="px-6 md:px-16 lg:px-24 xl:px-32 mt-4">
+    <div className="px-6 md:px-16 lg:px-24 xl:px-32 bg-white">
       <Button
-        className="bg-white hover:bg-gray-100 flex items-center gap-2 mb-6 text-gray-500 cursor-pointer hover:text-gray-700"
-        onClick={() => window.history.back()}
+        className="mt-8 mb-8 bg-white hover:bg-white flex items-center gap-2 text-gray-500 cursor-pointer"
+        onClick={() => router.back()}
       >
-        <FaArrowLeft /> Back to all Cars
+        <FaArrowLeft /> Volver a todos los autos
       </Button>
-
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
-        {/* left car image */}
+        {/* Imagen del auto */}
         <div className="lg:col-span-2">
           {/* Carrusel */}
-          <div className="relative w-full aspect-[16/9] rounded-lg mb-8 bg-gray-100">
+          <div className="relative overflow-hidden lg:h-[38rem] rounded-lg">
             <Carousel className="overflow-hidden relative w-full  rounded-lg mb-8 bg-gray-100">
-              <CarouselContent className="h-full">
+              <CarouselContent>
                 {images.map((img, idx) => (
-                  <CarouselItem key={idx} className="flex h-full">
+                  <CarouselItem key={idx}>
                     <Image
                       src={img}
-                      alt={`car-img-${idx}`}
-                      className="w-full h-full object-cover flex-shrink-0"
+                      alt={`auto-img-${idx}`}
+                      className="w-full h-auto object-cover"
                       width={400}
                       height={192}
                     />
@@ -98,51 +102,98 @@ export default function CarDetailsPage() {
           </div>
 
           {/* Datos del auto */}
-          <div className="space-y-6 mt-6">
+          <div className="space-y-6">
             <div>
-              <h1 className="text-3xl font-bold">
+              <h1 className="text-3xl font-bold lg:mt-8">
                 {car.brand} {car.model}
               </h1>
-              <p className="text-gray-500 text-lg">
-                {car.category} ● {car.year}
-              </p>
             </div>
+            {/* título */}
+
+            {/* subtítulo */}
+            <h2 className="text-xl font-semibold mt-8">
+              Información del vehículo
+            </h2>
             <hr className="border-borderColor my-6" />
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
               {[
                 {
-                  icon: <BsPeopleFill />,
-                  text: `${car.color}`,
+                  icon: <TbCategoryFilled />,
+                  text: `${car.category}`,
+                  info: "Categoría",
                 },
-                { icon: <BsFillFuelPumpFill />, text: car.fuel_type },
-                { icon: <FaCarAlt />, text: car.transmission },
-                { icon: <MdLocationPin />, text: car.location },
-              ].map(({ icon, text }) => (
+                {
+                  icon: <FaRegCalendarTimes />,
+                  text: `${car.year}`,
+                  info: "Año",
+                },
+                {
+                  icon: <IoIosColorFill />,
+                  text: `${car.color}`,
+                  info: "Color",
+                },
+                {
+                  icon: <BsFillFuelPumpFill />,
+                  text: `${car.fuel_type}`,
+                  info: "Combustible",
+                },
+                {
+                  icon: <FaCarAlt />,
+                  text: `${car.transmission}`,
+                  info: "Transmisión",
+                },
+                {
+                  icon: <MdLocationPin />,
+                  text: `${car.location}`,
+                  info: "Ubicación",
+                },
+                {
+                  icon: <FaCarAlt />,
+                  text: `${car.mileage.toLocaleString("es-PE")} km`,
+                  info: "Kilometraje",
+                },
+                {
+                  icon: <VscSymbolProperty />,
+                  text: `${car.drive_type}`,
+                  info: "Tracción",
+                },
+              ].map(({ icon, text, info }) => (
                 <div
-                  key={text}
-                  className="flex flex-col items-center bg-gray-100 p-4 rounded-lg text-gray-500"
+                  key={info}
+                  className="flex flex-col items-center bg-white rounded-lg p-4 text-gray-500 shadow-lg"
                 >
-                  <span className="h-5 mb-2">{icon}</span>
-                  <span className="">{text}</span>
+                  <div className="p-4 flex flex-col items-center justify-center h-full">
+                    <span className="w-6 h-6 text-gray-900 mb-2 font-bold">
+                      {icon}
+                    </span>
+                    <p className="text-xs text-gray-500 mb-1">{info}</p>
+                    <p className="text-sm font-semibold text-gray-900">
+                      {text}
+                    </p>
+                  </div>
                 </div>
               ))}
             </div>
 
-            {/* description  */}
-            <div>
-              <h1 className="text-xl font-medium mb-3">Description</h1>
+            {/* descripción */}
+            <div className="lg:mb-16">
+              <h1 className="text-xl font-medium mb-3">
+                Información adicional
+              </h1>
               <p className="text-gray-500">{car.description}</p>
             </div>
           </div>
         </div>
-        {/* right side booking */}
-        <form className="shadow-lg h-max sticky top-30 rounded-xl p-6 space-y-6 text-gray-500">
-          <p className="text-2xl text-black font-bold ">$ {car.price}</p>
+        {/* lado derecho contacto */}
+        <div className="shadow-lg h-max sticky top-30 rounded-xl p-6 space-y-6 text-gray-500">
+          <p className="text-2xl text-black font-bold text-center ">
+            Precio: {car.price.toLocaleString("es-PE")} dólares
+          </p>
           <hr className="border-zinc-400" />
-          <button className="w-full bg-orange-300 hover:bg-orange-400 trasnition-all py-3 font-medium text-white rounded-xl cursor-pointer">
+          <button className="w-full bg-blue-600 hover:bg-blue-800 transition-all py-3 font-medium text-white rounded-xl cursor-pointer">
             Contactar
           </button>
-        </form>
+        </div>
       </div>
     </div>
   ) : (

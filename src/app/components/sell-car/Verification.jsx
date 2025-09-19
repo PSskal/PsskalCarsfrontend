@@ -5,14 +5,10 @@ import { Input } from "@/components/ui/input";
 import { ArrowRight } from "lucide-react";
 
 const Verification = ({ data, onUpdate, onVerified }) => {
-  const [verificationCode, setVerificationCode] = useState([
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-  ]);
+  const CODE_LENGTH = 5;
+  const [verificationCode, setVerificationCode] = useState(
+    Array(CODE_LENGTH).fill("")
+  );
 
   const inputsRef = useRef([]);
 
@@ -23,7 +19,7 @@ const Verification = ({ data, onUpdate, onVerified }) => {
       next[index] = value.slice(0, 1);
       return next;
     });
-    if (value && index < 5) {
+    if (value && index < CODE_LENGTH - 1) {
       inputsRef.current[index + 1]?.focus();
     }
   };
@@ -44,7 +40,7 @@ const Verification = ({ data, onUpdate, onVerified }) => {
     } else if (key === "ArrowLeft" && index > 0) {
       e.preventDefault();
       inputsRef.current[index - 1]?.focus();
-    } else if (key === "ArrowRight" && index < 5) {
+    } else if (key === "ArrowRight" && index < CODE_LENGTH - 1) {
       e.preventDefault();
       inputsRef.current[index + 1]?.focus();
     }
@@ -54,15 +50,15 @@ const Verification = ({ data, onUpdate, onVerified }) => {
     const pasted = (e.clipboardData.getData("text") || "").replace(/\D/g, "");
     if (!pasted) return;
     e.preventDefault();
-    const chars = pasted.slice(0, 6).split("");
+    const chars = pasted.slice(0, CODE_LENGTH).split("");
     setVerificationCode((prev) => {
       const next = [...prev];
-      for (let i = 0; i < 6; i += 1) {
+      for (let i = 0; i < CODE_LENGTH; i += 1) {
         next[i] = chars[i] || "";
       }
       return next;
     });
-    const focusIndex = Math.min(chars.length, 5);
+    const focusIndex = Math.min(chars.length, CODE_LENGTH - 1);
     inputsRef.current[focusIndex]?.focus();
   };
 
@@ -70,11 +66,11 @@ const Verification = ({ data, onUpdate, onVerified }) => {
     const code = verificationCode.join("");
     console.log(code);
 
-    if (code.length === 6) {
+    if (code.length === CODE_LENGTH) {
       onVerified?.(code);
     } else {
       // minimal feedback fallback
-      alert("Ingresa los 6 dígitos del código");
+      alert("Ingresa los 5 dígitos del código");
     }
   };
 
@@ -86,20 +82,19 @@ const Verification = ({ data, onUpdate, onVerified }) => {
     <div className="p-8">
       <div className="mb-6">
         <h2 className="text-2xl font-bold text-gray-900 mb-2">
-          Preferencias Generales
+          Verificación por WhatsApp
         </h2>
       </div>
       <div className="space-y-8">
         {/* Contact Method */}
 
         <div className="text-center">
-          <h2 className="text-2xl font-semibold mb-2">
-            Verify your phone number
-          </h2>
-          <p className="text-gray-600 mb-6">Enter the code sent to 987678 </p>
+          <p className="text-gray-600 mb-6">
+            Ingresa el código de 5 dígitos que te enviamos por WhatsApp.
+          </p>
 
           <div className="mb-2">
-            <p className="text-sm text-gray-500 mb-4">6-digit code</p>
+            <p className="text-sm text-gray-500 mb-4">Código de 5 dígitos</p>
             <div className="flex justify-center gap-3 mb-6">
               {verificationCode.map((digit, index) => (
                 <Input
@@ -122,21 +117,28 @@ const Verification = ({ data, onUpdate, onVerified }) => {
             </div>
           </div>
 
-          <Button
-            onClick={verifyCode}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white mb-4"
-            disabled={verificationCode.some((digit) => !digit)}
-          >
-            Next
-            <ArrowRight className="w-4 h-4 ml-2" />
-          </Button>
+          <div className="space-y-3">
+            <Button
+              onClick={verifyCode}
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+              disabled={verificationCode.some((digit) => !digit)}
+            >
+              Verificar código
+              <ArrowRight className="w-4 h-4 ml-2" />
+            </Button>
 
-          <button
-            onClick={onClose}
-            className="text-gray-500 text-sm hover:text-gray-700"
-          >
-            Skip for now, I'll do it later in Settings
-          </button>
+            <div className="text-sm text-gray-600">
+              ¿No tienes el código? Pídelo por WhatsApp:
+            </div>
+            <a
+              href="https://wa.me/51900878539?text=Hola%2C%20necesito%20el%20c%C3%B3digo%20de%20verificaci%C3%B3n%20para%20vender%20mi%20carro."
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex w-full items-center justify-center rounded-md border border-green-500 px-4 py-2 text-sm font-medium text-green-700 hover:bg-green-50 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+            >
+              Solicitar código por WhatsApp
+            </a>
+          </div>
         </div>
       </div>
     </div>

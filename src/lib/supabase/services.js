@@ -171,4 +171,13 @@ export const carService = {
       throw err;
     }
   },
+
+  async getKeysAuth() {
+    const { data, error } = await supabase.from("keys").select("*");
+    if (error) {
+      console.error("Error fetching auth keys:", error);
+      return [];
+    }
+    return data;
+  },
 };

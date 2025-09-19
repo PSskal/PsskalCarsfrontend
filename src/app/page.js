@@ -53,7 +53,6 @@ const Home = () => {
       setPage(1);
     }
   }, [location]);
-  console.log(location);
 
   // Luego aplicar los demás filtros sobre ese resultado
   const filteredCars = cars.filter((car) => {

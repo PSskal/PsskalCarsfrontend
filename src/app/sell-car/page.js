@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { FaArrowLeft } from "react-icons/fa";
 import {
@@ -15,7 +15,6 @@ import PhotoUploadStep from "@/app/components/sell-car/PhotoUploadStep";
 import ContactStep from "@/app/components/sell-car/ContactStep";
 import { carService } from "@/lib/supabase/services";
 import Verification from "../components/sell-car/Verification";
-
 const getInitialFormState = () => ({
   vehicleDetails: {
     make: "",
@@ -46,6 +45,15 @@ const SellCar = () => {
   const [status, setStatus] = useState({ type: null, message: "" });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isVerified, setIsVerified] = useState(false);
+  const { getKeysAuth } = carService;
+  const [keys, setKeys] = useState([]);
+  useEffect(() => {
+    async function fetchKeys() {
+      const result = await getKeysAuth();
+      setKeys(Array.isArray(result) ? result : []);
+    }
+    fetchKeys();
+  }, []);
 
   const steps = [
     {
@@ -261,7 +269,33 @@ const SellCar = () => {
       {/* Verification gate: show Verification until user completes it */}
       {!isVerified ? (
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <Verification onVerified={() => setIsVerified(true)} />
+          <Verification
+            onVerified={(inputCode) => {
+              const normalizedInput = String(inputCode ?? "").trim();
+              const hasValidMatch =
+                Array.isArray(keys) &&
+                keys.some(
+                  (item) =>
+                    String(item?.auth_key ?? "").trim() === normalizedInput
+                );
+
+              if (hasValidMatch) {
+                setIsVerified(true);
+                setStatus({ type: null, message: "" });
+              } else {
+                setStatus({
+                  type: "error",
+                  message:
+                    "El código ingresado no es correcto. Intenta nuevamente.",
+                });
+              }
+            }}
+          />
+          {status.type === "error" && (
+            <div className="mb-4 rounded-md border px-4 py-3 text-sm border-red-200 bg-red-50 text-red-700">
+              {status.message}
+            </div>
+          )}
         </div>
       ) : (
         <>

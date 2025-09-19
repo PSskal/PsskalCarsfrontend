@@ -28,7 +28,6 @@ const FeacturedSectionsMobile = ({ filteredCars }) => {
   }, [filteredCars]);
 
   const carsToShow = cars.slice(0, visibleCount);
-  console.log("Cars to show:", carsToShow);
 
   return (
     <div className="z-0 flex flex-col items-center px-6 md:px-4 lg:px-10 xl:px-7">

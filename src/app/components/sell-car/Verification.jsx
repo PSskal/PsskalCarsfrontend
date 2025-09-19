@@ -64,14 +64,11 @@ const Verification = ({ data, onUpdate, onVerified }) => {
 
   const verifyCode = () => {
     const code = verificationCode.join("");
-    console.log(code);
-
-    if (code.length === CODE_LENGTH) {
-      onVerified?.(code);
-    } else {
-      // minimal feedback fallback
+    if (code.length !== CODE_LENGTH) {
       alert("Ingresa los 5 dígitos del código");
+      return;
     }
+    onVerified?.(code);
   };
 
   const onClose = () => {

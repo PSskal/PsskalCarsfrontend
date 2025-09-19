@@ -16,6 +16,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
+import { Button } from "@/components/ui/button";
 
 export default function CarDetailsPage() {
   const { id } = useParams();
@@ -65,12 +66,12 @@ export default function CarDetailsPage() {
 
   return car ? (
     <div data-scroll-section className="px-6 md:px-16 lg:px-24 xl:px-32 mt-4">
-      <button
-        className="flex items-center gap-2 mb-6 text-gray-500 cursor-pointer hover:text-gray-700"
+      <Button
+        className="bg-white hover:bg-gray-100 flex items-center gap-2 mb-6 text-gray-500 cursor-pointer hover:text-gray-700"
         onClick={() => window.history.back()}
       >
         <FaArrowLeft /> Back to all Cars
-      </button>
+      </Button>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
         {/* left car image */}

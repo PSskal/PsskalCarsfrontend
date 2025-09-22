@@ -1,11 +1,9 @@
 import React from "react";
-import Tittle from "./Tittle";
 import CarCard from "./CarCard";
 import { FaArrowRight } from "react-icons/fa";
 import {
   Pagination,
   PaginationContent,
-  PaginationEllipsis,
   PaginationItem,
   PaginationLink,
   PaginationNext,
@@ -14,7 +12,7 @@ import {
 
 const FeacturedSections = ({ filteredCars, page, setPage }) => {
   const cars = filteredCars && filteredCars.length > 0 ? filteredCars : [];
-  const itemsPerPage = 2;
+  const itemsPerPage = 6;
   const totalPages = Math.ceil(cars.length / itemsPerPage);
   const carsToShow = cars.slice((page - 1) * itemsPerPage, page * itemsPerPage);
 

@@ -15,6 +15,7 @@ import PhotoUploadStep from "@/app/components/sell-car/PhotoUploadStep";
 import ContactStep from "@/app/components/sell-car/ContactStep";
 import { carService } from "@/lib/supabase/services";
 import Verification from "../components/sell-car/Verification";
+import ListingPreview from "../components/sell-car/ListingPreview";
 const getInitialFormState = () => ({
   vehicleDetails: {
     make: "",
@@ -44,7 +45,7 @@ const SellCar = () => {
   const [formData, setFormData] = useState(getInitialFormState());
   const [status, setStatus] = useState({ type: null, message: "" });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isVerified, setIsVerified] = useState(false);
+  const [isVerified, setIsVerified] = useState(true);
   const { getKeysAuth } = carService;
   const [keys, setKeys] = useState([]);
   useEffect(() => {
@@ -74,6 +75,12 @@ const SellCar = () => {
       title: "Fotos",
       icon: Camera,
       description: "Imágenes de alta calidad",
+    },
+    {
+      id: 4,
+      title: "Publicar",
+      icon: Check,
+      description: "Revisar y publicar",
     },
   ];
 
@@ -123,6 +130,8 @@ const SellCar = () => {
             onUpdate={(data) => updateFormData("photos", data)}
           />
         );
+      case 4:
+        return <ListingPreview data={formData} />;
       default:
         return null;
     }

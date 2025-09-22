@@ -7,15 +7,20 @@ import { FaCarAlt } from "react-icons/fa";
 import { MdLocationPin } from "react-icons/md";
 import Image from "next/image";
 
-const CarCard = ({ car }) => {
+const CarCard = ({ car, disableNavigation }) => {
   const router = useRouter();
+  const handleClick = () => {
+    if (!disableNavigation) {
+      router.push(`/car-details/${car.id}`);
+      window.scrollTo(0, 0);
+    }
+  };
   return (
     <div
-      onClick={() => {
-        router.push(`/car-details/${car.id}`);
-        window.scrollTo(0, 0);
-      }}
-      className="group rounded-xl overflow-hidden shadow-lg hover:-translate-y-1 transition-all duration-500 cursor-pointer"
+      onClick={handleClick}
+      className={`group rounded-xl overflow-hidden shadow-lg hover:-translate-y-1 transition-all duration-500 ${
+        disableNavigation ? "" : "cursor-pointer"
+      }`}
     >
       <div className="relative h-48 overflow-hidden">
         <Image
@@ -34,7 +39,7 @@ const CarCard = ({ car }) => {
         <div className="absolute bottom-4 right-4 flex flex-col items-end gap-1">
           <div className="bg-black/80 backdrop-blur-sm text-white px-3 py-2 rounded-lg">
             <span className="font-bold">
-              ${car.price.toLocaleString("es-PE")}
+              {car.currency} {car.price.toLocaleString("es-PE")}
             </span>
           </div>
           {car.posted_at && (

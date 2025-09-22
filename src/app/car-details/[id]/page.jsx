@@ -125,7 +125,7 @@ export default function CarDetailsPage() {
                 {
                   icon: <FaRegCalendarTimes />,
                   text: `${car.year}`,
-                  info: "Año",
+                  info: "Año Modelo",
                 },
                 {
                   icon: <IoIosColorFill />,
@@ -187,7 +187,8 @@ export default function CarDetailsPage() {
         {/* lado derecho contacto */}
         <div className="shadow-lg h-max sticky top-30 rounded-xl p-6 space-y-6 text-gray-500">
           <p className="text-2xl text-black font-bold text-center ">
-            Precio: {car.price.toLocaleString("es-PE")} dólares
+            Precio: {car.price.toLocaleString("es-PE")}{" "}
+            {car.currency === "USD" ? "Dolares" : "Soles"}
           </p>
           <hr className="border-zinc-400" />
           <button className="w-full bg-blue-600 hover:bg-blue-800 transition-all py-3 font-medium text-white rounded-xl cursor-pointer">

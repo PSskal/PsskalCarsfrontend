@@ -1,84 +1,66 @@
-import React from "react";
-import {
-  Edit,
-  MapPin,
-  Phone,
-  Mail,
-  MessageSquare,
-  Clock,
-  Star,
-  Shield,
-  Eye,
-} from "lucide-react";
+"use client";
+import React, { useRef } from "react";
 import CarCard from "../carros/CarCard";
+import { Input } from "@/components/ui/input";
 
-const ListingPreview = ({ data }) => {
-  const formatCurrency = (amount) => {
-    if (!amount) return "No especificado";
-    return new Intl.NumberFormat("es-MX", {
-      style: "currency",
-      currency: "MXN",
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    })?.format(amount);
-  };
+const ListingPreview = ({ data, onTokenChange }) => {
+  const vehicleDetails = data?.vehicleDetails || {};
+  const photos = data?.photos || [];
 
-  const getConditionLabel = (condition) => {
-    const conditions = {
-      excellent: "Excelente",
-      good: "Bueno",
-      fair: "Regular",
-      poor: "Necesita reparaciones",
-    };
-    return conditions?.[condition] || condition;
-  };
+  const CODE_LENGTH = 4;
+  const sanitizedToken = (data?.car_token ?? "")
+    .replace(/\D/g, "")
+    .slice(0, CODE_LENGTH);
+  const digits = Array.from(
+    { length: CODE_LENGTH },
+    (_, index) => sanitizedToken[index] || ""
+  );
 
-  const getContactMethodIcon = (method) => {
-    switch (method) {
-      case "phone":
-        return Phone;
-      case "email":
-        return Mail;
-      case "messages":
-        return MessageSquare;
-      default:
-        return Phone;
+  const inputsRef = useRef([]);
+
+  const handleCodeChange = (index, rawValue) => {
+    const value = (rawValue || "").replace(/\D/g, "");
+    const nextDigits = [...digits];
+    nextDigits[index] = value.slice(0, 1);
+    onTokenChange?.(nextDigits.join(""));
+    if (nextDigits[index] && index < CODE_LENGTH - 1) {
+      inputsRef.current[index + 1]?.focus();
     }
   };
 
-  const getContactMethodLabel = (method) => {
-    const methods = {
-      phone: "Teléfono",
-      email: "Email",
-      messages: "Mensajes de la App",
-    };
-    return methods?.[method] || method;
+  const handleKeyDown = (index, e) => {
+    const key = e.key;
+    if (key === "Backspace" || key === "Delete") {
+      if (!digits[index] && index > 0) {
+        e.preventDefault();
+        const prevIndex = index - 1;
+        inputsRef.current[prevIndex]?.focus();
+        const nextDigits = [...digits];
+        nextDigits[prevIndex] = "";
+        onTokenChange?.(nextDigits.join(""));
+      }
+    } else if (key === "ArrowLeft" && index > 0) {
+      e.preventDefault();
+      inputsRef.current[index - 1]?.focus();
+    } else if (key === "ArrowRight" && index < CODE_LENGTH - 1) {
+      e.preventDefault();
+      inputsRef.current[index + 1]?.focus();
+    }
   };
 
-  const getFeatureLabel = (featureId) => {
-    const features = {
-      air_conditioning: "Aire Acondicionado",
-      power_steering: "Dirección Asistida",
-      power_windows: "Ventanas Eléctricas",
-      central_locking: "Seguros Centralizados",
-      abs: "Frenos ABS",
-      airbags: "Airbags",
-      cruise_control: "Control de Crucero",
-      bluetooth: "Bluetooth",
-      navigation: "Sistema de Navegación",
-      sunroof: "Techo Solar",
-      leather_seats: "Asientos de Cuero",
-      heated_seats: "Asientos Calefaccionados",
-    };
-    return features?.[featureId] || featureId;
+  const handlePaste = (e) => {
+    const pasted = (e.clipboardData.getData("text") || "").replace(/\D/g, "");
+    if (!pasted) return;
+    e.preventDefault();
+    const chars = pasted.slice(0, CODE_LENGTH).split("");
+    const nextDigits = Array.from(
+      { length: CODE_LENGTH },
+      (_, i) => chars[i] || ""
+    );
+    onTokenChange?.(nextDigits.join(""));
+    const focusIndex = Math.min(chars.length, CODE_LENGTH - 1);
+    inputsRef.current[focusIndex]?.focus();
   };
-
-  const vehicleDetails = data?.vehicleDetails || {};
-  const photos = data?.photos || [];
-  const pricing = data?.pricing || {};
-  const contact = data?.contact || {};
-
-  const ContactIcon = getContactMethodIcon(contact?.method);
 
   return (
     <div className="p-8">
@@ -113,13 +95,39 @@ const ListingPreview = ({ data }) => {
           disableNavigation
         />
       </div>
-      {/* Action Buttons */}
-      {/* <div className="flex justify-between mt-8">
-        <button variant="outline" className="flex items-center space-x-2">
-          <Edit className="w-4 h-4" />
-          <span>Editar Anuncio</span>
-        </button>
-      </div> */}
+
+      <div className="mb-2">
+        <p className="text-sm text-gray-500 mb-4">
+          Ingresa tu token de 4 dígitos
+        </p>
+
+        <div className="flex justify-center gap-3 mb-6">
+          {digits.map((digit, index) => (
+            <Input
+              key={index}
+              id={`code-${index}`}
+              type="text"
+              inputMode="numeric"
+              pattern="[0-9]*"
+              maxLength={1}
+              value={digit}
+              onChange={(e) => handleCodeChange(index, e.target.value)}
+              onKeyDown={(e) => handleKeyDown(index, e)}
+              onPaste={handlePaste}
+              ref={(el) => {
+                inputsRef.current[index] = el;
+              }}
+              className="w-12 h-12 text-center text-lg font-medium border-2 focus:border-purple-600"
+            />
+          ))}
+        </div>
+        <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded text-yellow-800 text-xs text-center">
+          <strong>Importante:</strong> Guarda este token. Lo necesitarás para
+          editar tu anuncio, marcarlo como vendido o ampliar la publicación en
+          el futuro. Si lo pierdes, no podrás gestionar tu anuncio.
+        </div>
+      </div>
+
       {/* Publishing Tips */}
       <div className="mt-6 p-4 bg-green-50 rounded-lg border border-green-200">
         <h4 className="font-semibold text-green-900 mb-2">

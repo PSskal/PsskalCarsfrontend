@@ -114,6 +114,7 @@ export default function CarDetailsPage() {
             <h2 className="text-xl font-semibold mt-8">
               Información del vehículo
             </h2>
+
             <hr className="border-borderColor my-6" />
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
               {[
@@ -191,8 +192,17 @@ export default function CarDetailsPage() {
             {car.currency === "USD" ? "Dolares" : "Soles"}
           </p>
           <hr className="border-zinc-400" />
-          <button className="w-full bg-blue-600 hover:bg-blue-800 transition-all py-3 font-medium text-white rounded-xl cursor-pointer">
-            Contactar
+
+          <a
+            href={`https://wa.me/${car.contact_phone}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block w-full bg-blue-600 hover:bg-blue-800 transition-all py-3 font-medium text-white rounded-xl cursor-pointer text-center"
+          >
+            Contactar por WhatsApp
+          </a>
+          <button className="block w-full bg-zinc-800 hover:bg-zinc-700 transition-all py-3 font-medium text-white rounded-xl cursor-pointer text-center">
+            Soy el dueño, cambiar estado del carro
           </button>
         </div>
       </div>

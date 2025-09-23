@@ -38,6 +38,7 @@ const getInitialFormState = () => ({
     additionalInfo: "",
   },
   photos: [],
+  car_token: "",
 });
 
 const SellCar = () => {
@@ -95,6 +96,17 @@ const SellCar = () => {
     }
   };
 
+  const handleTokenChange = (tokenValue) => {
+    setFormData((prev) => ({
+      ...prev,
+      car_token: tokenValue,
+    }));
+
+    if (status.type) {
+      setStatus({ type: null, message: "" });
+    }
+  };
+
   const nextStep = () => {
     if (currentStep < steps.length) {
       setCurrentStep((prev) => prev + 1);
@@ -131,14 +143,14 @@ const SellCar = () => {
           />
         );
       case 4:
-        return <ListingPreview data={formData} />;
+        return <ListingPreview data={formData} onTokenChange={handleTokenChange} />;
       default:
         return null;
     }
   };
 
   const handleSubmit = async () => {
-    const { vehicleDetails, contact, photos } = formData;
+    const { vehicleDetails, contact, photos, car_token } = formData;
 
     const validations = [
       { isValid: !!vehicleDetails.make, label: "Marca", step: 1 },
@@ -158,6 +170,11 @@ const SellCar = () => {
       { isValid: !!contact.askingPrice, label: "Precio de venta", step: 2 },
       { isValid: !!contact.location, label: "Ubicación", step: 2 },
       { isValid: photos?.length > 0, label: "Al menos una foto", step: 3 },
+      {
+        isValid: /^\d{4}$/.test((car_token || "").trim()),
+        label: "Código de verificación de 4 dígitos",
+        step: 4,
+      },
     ];
 
     const missing = validations.filter((item) => !item.isValid);
@@ -223,6 +240,7 @@ const SellCar = () => {
       location: contact.location,
       description: contact.additionalInfo || "",
       contact_phone: contact.phone,
+      car_token: car_token?.trim(),
     };
 
     const sanitizedPayload = Object.fromEntries(
@@ -423,3 +441,4 @@ const SellCar = () => {
 };
 
 export default SellCar;
+

@@ -50,7 +50,11 @@ const FeacturedSections = ({ filteredCars, page, setPage }) => {
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-5">
         {carsToShow.map((car) => (
           <div key={car.id} className="">
-            <CarCard car={car} className="flex-1 h-full" />
+            <CarCard
+              car={car}
+              className="flex-1 h-full"
+              disableNavigation={car.status !== "disponible"}
+            />
           </div>
         ))}
       </div>

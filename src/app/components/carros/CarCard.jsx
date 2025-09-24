@@ -30,11 +30,13 @@ const CarCard = ({ car, disableNavigation }) => {
           width={400}
           height={192}
         />
-        {car.is_available && (
-          <p className="absolute top-4 left-4 bg-blue-800 text-white text-xs px-2.5 py-1 rounded-full">
-            Disponible Ahora
-          </p>
-        )}
+        <p
+          className={`absolute top-4 left-4 text-white text-xs px-2.5 py-1 rounded-full
+            ${car.status === "disponible" ? "bg-blue-800" : "bg-gray-800"}
+          `}
+        >
+          {car.status === "disponible" ? "Disponible Ahora" : "Vendido"}
+        </p>
 
         <div className="absolute bottom-4 right-4 flex flex-col items-end gap-1">
           <div className="bg-black/80 backdrop-blur-sm text-white px-3 py-2 rounded-lg">

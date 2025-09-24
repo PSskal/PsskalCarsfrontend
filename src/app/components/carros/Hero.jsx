@@ -6,10 +6,9 @@ export default function Hero({
   searchQuery,
   setSearchQuery,
   setSelectedBrands,
+  statusCar,
+  setStatusCar,
 }) {
-  const [activeTab, setActiveTab] = useState("Buy Car");
-  const [sortBy, setSortBy] = useState("Recommended");
-
   return (
     <div className="max-h-screen bg-gray-50 mt-20">
       {/* Header */}
@@ -20,23 +19,23 @@ export default function Hero({
               <div className="flex bg-gray-100 rounded-lg p-1">
                 <button
                   className={`rounded-md px-4 py-2 font-medium ${
-                    activeTab === "Buy Car"
+                    statusCar === "disponible"
                       ? "bg-blue-600 text-white"
                       : "bg-transparent text-gray-700"
                   }`}
-                  onClick={() => setActiveTab("Buy Car")}
+                  onClick={() => setStatusCar("disponible")}
                 >
-                  Comprar
+                  Disponible
                 </button>
                 <button
                   className={`rounded-md px-4 py-2 font-medium ${
-                    activeTab === "Rent Car"
+                    statusCar === "vendido"
                       ? "bg-blue-600 text-white"
                       : "bg-transparent text-gray-700"
                   }`}
-                  onClick={() => setActiveTab("Rent Car")}
+                  onClick={() => setStatusCar("vendido")}
                 >
-                  Financiamiento
+                  Vendido
                 </button>
               </div>
 
@@ -67,8 +66,8 @@ export default function Hero({
                 <span className="text-sm">Sort by:</span>
                 <select
                   className="border rounded-md px-3 py-2 text-sm"
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value)}
+                  // value={sortBy}
+                  // onChange={(e) => setSortBy(e.target.value)}
                 >
                   <option>Recommended</option>
                   <option>Price: Low to High</option>

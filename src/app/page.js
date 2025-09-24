@@ -16,6 +16,7 @@ import { useCarContext } from "@/context/CarContext";
 const Home = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [isAutomatic, setIsAutomatic] = useState(false);
+  const [statusCar, setStatusCar] = useState("disponible");
   const [carType, setCarType] = useState("New Car");
   const [selectedBrands, setSelectedBrands] = useState(["All Brand"]);
   const [priceRange, setPriceRange] = useState([100, 150000]);
@@ -69,9 +70,17 @@ const Home = () => {
       !isAutomatic || car.transmission?.includes("Automatico");
     const matchesPriceRange =
       car.price >= priceRange[0] && car.price <= priceRange[1];
+    const matchesStatus =
+      statusCar === "disponible"
+        ? car.status === "disponible"
+        : car.status === "vendido";
 
     return (
-      matchesSearch && matchesTestDrive && matchesPriceRange && matchesBrand
+      matchesSearch &&
+      matchesTestDrive &&
+      matchesPriceRange &&
+      matchesBrand &&
+      matchesStatus
     );
   });
 
@@ -127,6 +136,8 @@ const Home = () => {
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
         setSelectedBrands={setSelectedBrands}
+        statusCar={statusCar}
+        setStatusCar={setStatusCar}
       />
       <div className="grid grid-cols-5 grid-rows-5 gap-4">
         <div className="row-span-5">

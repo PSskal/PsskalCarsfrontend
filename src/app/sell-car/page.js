@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { FaArrowLeft } from "react-icons/fa";
 import {
@@ -9,6 +10,10 @@ import {
   Camera,
   Phone,
   Check,
+  CheckCircle,
+  XCircle,
+  X,
+  Clock,
 } from "lucide-react";
 import VehicleDetailsStep from "@/app/components/sell-car/VehicleDetailsStep";
 import PhotoUploadStep from "@/app/components/sell-car/PhotoUploadStep";
@@ -41,74 +46,164 @@ const getInitialFormState = () => ({
   car_token: "",
 });
 
+// Constants
+const STEPS_CONFIG = [
+  {
+    id: 1,
+    title: "Detalles",
+    icon: Car,
+    description: "Información básica de tu vehículo",
+  },
+  {
+    id: 2,
+    title: "Preferencia",
+    icon: Phone,
+    description: "Preferencias de comunicación",
+  },
+  {
+    id: 3,
+    title: "Fotos",
+    icon: Camera,
+    description: "Imágenes de alta calidad",
+  },
+  {
+    id: 4,
+    title: "Publicar",
+    icon: Check,
+    description: "Revisar y publicar",
+  },
+];
+
+const VALIDATION_RULES = [
+  { field: "vehicleDetails.make", label: "Marca", step: 1 },
+  { field: "vehicleDetails.model", label: "Modelo", step: 1 },
+  { field: "vehicleDetails.year", label: "Año", step: 1 },
+  { field: "vehicleDetails.category", label: "Categoría", step: 1 },
+  { field: "vehicleDetails.fuel_type", label: "Tipo de combustible", step: 1 },
+  { field: "vehicleDetails.transmission", label: "Transmisión", step: 1 },
+  { field: "vehicleDetails.traction", label: "Tracción", step: 1 },
+  { field: "vehicleDetails.color", label: "Color", step: 1 },
+  { field: "vehicleDetails.mileage", label: "Kilometraje", step: 1 },
+  { field: "contact.phone", label: "Teléfono de contacto", step: 2 },
+  { field: "contact.askingPrice", label: "Precio de venta", step: 2 },
+  { field: "contact.location", label: "Ubicación", step: 2 },
+];
+
 const SellCar = () => {
+  const router = useRouter();
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState(getInitialFormState());
   const [status, setStatus] = useState({ type: null, message: "" });
+  const [publishStatus, setPublishStatus] = useState({
+    type: null,
+    message: "",
+    visible: false,
+  });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isVerified, setIsVerified] = useState(true);
-  const { getKeysAuth } = carService;
   const [keys, setKeys] = useState([]);
+  const [redirectCountdown, setRedirectCountdown] = useState(0);
+  const [isRedirecting, setIsRedirecting] = useState(false);
+
+  // Fetch authentication keys
   useEffect(() => {
-    async function fetchKeys() {
-      const result = await getKeysAuth();
-      setKeys(Array.isArray(result) ? result : []);
-    }
+    let mounted = true;
+
+    const fetchKeys = async () => {
+      try {
+        const result = await carService.getKeysAuth();
+        if (mounted) {
+          setKeys(Array.isArray(result) ? result : []);
+        }
+      } catch (error) {
+        console.error("Failed to fetch keys:", error);
+        if (mounted) {
+          setKeys([]);
+        }
+      }
+    };
+
     fetchKeys();
+    return () => {
+      mounted = false;
+    };
   }, []);
 
-  const steps = [
-    {
-      id: 1,
-      title: "Detalles",
-      icon: Car,
-      description: "Información básica de tu vehículo",
-    },
+  // Auto-dismiss feedback después de 5 segundos (solo para errores)
+  useEffect(() => {
+    if (publishStatus.visible && publishStatus.type === "error") {
+      const timer = setTimeout(() => {
+        setPublishStatus((prev) => ({ ...prev, visible: false }));
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [publishStatus.visible, publishStatus.type]);
 
-    {
-      id: 2,
-      title: "Preferencia",
-      icon: Phone,
-      description: "Preferencias de comunicación",
-    },
-    {
-      id: 3,
-      title: "Fotos",
-      icon: Camera,
-      description: "Imágenes de alta calidad",
-    },
-    {
-      id: 4,
-      title: "Publicar",
-      icon: Check,
-      description: "Revisar y publicar",
-    },
-  ];
+  // Auto-redirect countdown para publicaciones exitosas
+  useEffect(() => {
+    if (redirectCountdown > 0) {
+      const timer = setTimeout(() => {
+        setRedirectCountdown((prev) => prev - 1);
+      }, 1000);
+      return () => clearTimeout(timer);
+    } else if (redirectCountdown === 0 && isRedirecting) {
+      // Redirect al menú principal
+      router.push("/");
+    }
+  }, [redirectCountdown, isRedirecting, router]);
+
+  // Helper functions
+  const clearStatus = () => setStatus({ type: null, message: "" });
+
+  const clearPublishStatus = () =>
+    setPublishStatus({ type: null, message: "", visible: false });
+
+  const showPublishFeedback = (type, message) => {
+    setPublishStatus({ type, message, visible: true });
+  };
+
+  const hidePublishFeedback = () => {
+    setPublishStatus((prev) => ({ ...prev, visible: false }));
+  };
+
+  const startRedirectCountdown = () => {
+    setRedirectCountdown(3); // 3 segundos para redirect
+    setIsRedirecting(true);
+  };
+
+  const cancelRedirect = () => {
+    setRedirectCountdown(0);
+    setIsRedirecting(false);
+  };
+
+  const getFieldValue = (field, data = formData) => {
+    return field.split(".").reduce((obj, key) => obj?.[key], data);
+  };
+
+  const isValidField = (field, data = formData) => {
+    const value = getFieldValue(field, data);
+    if (field === "photos") return data.photos?.length > 0;
+    if (field === "car_token")
+      return /^\d{4}$/.test((data.car_token || "").trim());
+    return !!value;
+  };
 
   const updateFormData = (section, data) => {
     setFormData((prev) => ({
       ...prev,
       [section]: Array.isArray(data) ? data : { ...prev?.[section], ...data },
     }));
-
-    if (status.type) {
-      setStatus({ type: null, message: "" });
-    }
+    clearStatus();
+    clearPublishStatus();
   };
 
   const handleTokenChange = (tokenValue) => {
-    setFormData((prev) => ({
-      ...prev,
-      car_token: tokenValue,
-    }));
-
-    if (status.type) {
-      setStatus({ type: null, message: "" });
-    }
+    setFormData((prev) => ({ ...prev, car_token: tokenValue }));
+    clearStatus();
   };
 
   const nextStep = () => {
-    if (currentStep < steps.length) {
+    if (currentStep < STEPS_CONFIG.length) {
       setCurrentStep((prev) => prev + 1);
     }
   };
@@ -120,66 +215,56 @@ const SellCar = () => {
   };
 
   const renderStepContent = () => {
-    switch (currentStep) {
-      case 1:
-        return (
-          <VehicleDetailsStep
-            data={formData?.vehicleDetails}
-            onUpdate={(data) => updateFormData("vehicleDetails", data)}
-          />
-        );
-      case 2:
-        return (
-          <ContactStep
-            data={formData?.contact}
-            onUpdate={(data) => updateFormData("contact", data)}
-          />
-        );
-      case 3:
-        return (
-          <PhotoUploadStep
-            data={formData?.photos}
-            onUpdate={(data) => updateFormData("photos", data)}
-          />
-        );
-      case 4:
-        return <ListingPreview data={formData} onTokenChange={handleTokenChange} />;
-      default:
-        return null;
-    }
+    const stepComponents = {
+      1: () => (
+        <VehicleDetailsStep
+          data={formData?.vehicleDetails}
+          onUpdate={(data) => updateFormData("vehicleDetails", data)}
+        />
+      ),
+      2: () => (
+        <ContactStep
+          data={formData?.contact}
+          onUpdate={(data) => updateFormData("contact", data)}
+        />
+      ),
+      3: () => (
+        <PhotoUploadStep
+          data={formData?.photos}
+          onUpdate={(data) => updateFormData("photos", data)}
+        />
+      ),
+      4: () => (
+        <ListingPreview data={formData} onTokenChange={handleTokenChange} />
+      ),
+    };
+
+    return stepComponents[currentStep]?.() || null;
   };
 
-  const handleSubmit = async () => {
-    const { vehicleDetails, contact, photos, car_token } = formData;
-
+  const validateForm = () => {
     const validations = [
-      { isValid: !!vehicleDetails.make, label: "Marca", step: 1 },
-      { isValid: !!vehicleDetails.model, label: "Modelo", step: 1 },
-      { isValid: !!vehicleDetails.year, label: "Año", step: 1 },
-      { isValid: !!vehicleDetails.category, label: "Categoría", step: 1 },
+      ...VALIDATION_RULES.map((rule) => ({
+        ...rule,
+        isValid: isValidField(rule.field),
+      })),
       {
-        isValid: !!vehicleDetails.fuel_type,
-        label: "Tipo de combustible",
-        step: 1,
+        field: "photos",
+        label: "Al menos una foto",
+        step: 3,
+        isValid: isValidField("photos"),
       },
-      { isValid: !!vehicleDetails.transmission, label: "Transmisión", step: 1 },
-      { isValid: !!vehicleDetails.traction, label: "Tracción", step: 1 },
-      { isValid: !!vehicleDetails.color, label: "Color", step: 1 },
-      { isValid: !!vehicleDetails.mileage, label: "Kilometraje", step: 1 },
-      { isValid: !!contact.phone, label: "Teléfono de contacto", step: 2 },
-      { isValid: !!contact.askingPrice, label: "Precio de venta", step: 2 },
-      { isValid: !!contact.location, label: "Ubicación", step: 2 },
-      { isValid: photos?.length > 0, label: "Al menos una foto", step: 3 },
       {
-        isValid: /^\d{4}$/.test((car_token || "").trim()),
+        field: "car_token",
         label: "Código de verificación de 4 dígitos",
         step: 4,
+        isValid: isValidField("car_token"),
       },
     ];
 
     const missing = validations.filter((item) => !item.isValid);
 
-    if (missing.length) {
+    if (missing.length > 0) {
       const firstMissingStep = missing[0].step;
       if (currentStep !== firstMissingStep) {
         setCurrentStep(firstMissingStep);
@@ -190,40 +275,23 @@ const SellCar = () => {
         type: "error",
         message: `Completa los siguientes campos: ${labels}.`,
       });
-      return;
+      return false;
     }
 
-    setIsSubmitting(true);
+    return true;
+  };
 
-    let uploadedUrls = [];
-    try {
-      uploadedUrls = await carService.uploadCarImages(photos);
-    } catch (uploadError) {
-      console.error("Failed to upload car images:", uploadError);
-      setStatus({
-        type: "error",
-        message: "No se pudieron subir las fotos. Inténtalo nuevamente.",
-      });
-      setIsSubmitting(false);
-      return;
-    }
-
-    if (!uploadedUrls.length) {
-      setStatus({
-        type: "error",
-        message:
-          "No se generaron enlaces para las fotos. Verifica el bucket carimages.",
-      });
-      setIsSubmitting(false);
-      return;
-    }
-
+  const createCarPayload = (
+    vehicleDetails,
+    contact,
+    car_token,
+    primaryImage
+  ) => {
     const year = Number(vehicleDetails.year);
     const mileage = Number(vehicleDetails.mileage);
     const price = Number(contact.askingPrice);
-    const primaryImage = uploadedUrls[0];
 
-    const carPayload = {
+    const payload = {
       brand: vehicleDetails.make,
       model: vehicleDetails.model,
       year: Number.isNaN(year) ? undefined : year,
@@ -241,31 +309,62 @@ const SellCar = () => {
       description: contact.additionalInfo || "",
       contact_phone: contact.phone,
       car_token: car_token?.trim(),
+      status: "Disponible",
     };
 
-    const sanitizedPayload = Object.fromEntries(
-      Object.entries(carPayload).filter(([, value]) => {
-        if (typeof value === "number") {
-          return !Number.isNaN(value);
-        }
+    // Remove undefined/null/empty values
+    return Object.fromEntries(
+      Object.entries(payload).filter(([, value]) => {
+        if (typeof value === "number") return !Number.isNaN(value);
         return value !== undefined && value !== null && value !== "";
       })
     );
+  };
+
+  const handleSubmit = async () => {
+    if (!validateForm()) return;
+
+    const { vehicleDetails, contact, photos, car_token } = formData;
+
+    setIsSubmitting(true);
+    clearPublishStatus();
 
     try {
-      await carService.createCarListing(sanitizedPayload, uploadedUrls);
-      setStatus({
-        type: "success",
-        message: "Tu anuncio se publicó correctamente.",
-      });
+      // Upload images
+      const uploadedUrls = await carService.uploadCarImages(photos);
+
+      if (!uploadedUrls?.length) {
+        throw new Error("No se generaron enlaces para las fotos");
+      }
+
+      // Create and submit payload
+      const payload = createCarPayload(
+        vehicleDetails,
+        contact,
+        car_token,
+        uploadedUrls[0]
+      );
+      await carService.createCarListing(payload, uploadedUrls);
+
+      // Success
+      showPublishFeedback("success", "¡Tu anuncio se publicó correctamente!");
       setFormData(getInitialFormState());
       setCurrentStep(1);
+
+      // Iniciar countdown para redirect automático
+      setTimeout(() => {
+        startRedirectCountdown();
+      }, 1000); // Esperar 1 segundo antes de iniciar countdown
     } catch (error) {
       console.error("Failed to create car listing:", error);
-      setStatus({
-        type: "error",
-        message: "No se pudo publicar el anuncio. Inténtalo nuevamente.",
-      });
+
+      const isUploadError = error.message?.includes("fotos");
+      showPublishFeedback(
+        "error",
+        isUploadError
+          ? "No se pudieron subir las fotos. Inténtalo nuevamente."
+          : "No se pudo publicar el anuncio. Inténtalo nuevamente."
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -287,7 +386,7 @@ const SellCar = () => {
               Vender Mi Carro
             </h1> */}
             <div className="text-sm text-gray-500">
-              Paso {currentStep} de {steps?.length}
+              Paso {currentStep} de {STEPS_CONFIG.length}
             </div>
           </div>
         </div>
@@ -308,7 +407,7 @@ const SellCar = () => {
 
               if (hasValidMatch) {
                 setIsVerified(true);
-                setStatus({ type: null, message: "" });
+                clearStatus();
               } else {
                 setStatus({
                   type: "error",
@@ -329,13 +428,13 @@ const SellCar = () => {
           <div className="bg-white shadow-sm">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
               <div className="flex items-center justify-between">
-                {steps?.map((step, index) => {
-                  const StepIcon = step?.icon;
-                  const isCompleted = currentStep > step?.id;
-                  const isCurrent = currentStep === step?.id;
+                {STEPS_CONFIG.map((step, index) => {
+                  const StepIcon = step.icon;
+                  const isCompleted = currentStep > step.id;
+                  const isCurrent = currentStep === step.id;
 
                   return (
-                    <div key={step?.id}>
+                    <div key={step.id}>
                       <div className="flex flex-col items-center">
                         <div
                           className={`w-12 h-12 rounded-full flex items-center justify-center border-2 ${
@@ -362,17 +461,17 @@ const SellCar = () => {
                                 : "text-gray-500"
                             }`}
                           >
-                            {step?.title}
+                            {step.title}
                           </div>
                           <div className="text-xs text-gray-500 hidden sm:block">
-                            {step?.description}
+                            {step.description}
                           </div>
                         </div>
                       </div>
-                      {index < steps?.length - 1 && (
+                      {index < STEPS_CONFIG.length - 1 && (
                         <div
                           className={`flex-1 h-0.5 mx-4 ${
-                            currentStep > step?.id
+                            currentStep > step.id
                               ? "bg-blue-900"
                               : "bg-gray-300"
                           }`}
@@ -387,6 +486,7 @@ const SellCar = () => {
 
           {/* Main Content */}
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            {/* Feedback general */}
             {status.message && (
               <div
                 className={`mb-6 rounded-md border px-4 py-3 text-sm ${
@@ -398,6 +498,7 @@ const SellCar = () => {
                 {status.message}
               </div>
             )}
+
             <div className="bg-white rounded-lg shadow-sm border">
               {renderStepContent()}
             </div>
@@ -414,7 +515,7 @@ const SellCar = () => {
                 <span>Anterior</span>
               </Button>
 
-              {currentStep < steps.length ? (
+              {currentStep < STEPS_CONFIG.length ? (
                 <Button
                   onClick={nextStep}
                   className="flex items-center space-x-2"
@@ -436,9 +537,82 @@ const SellCar = () => {
           </div>
         </>
       )}
+
+      {/* Toast Notification Success */}
+      {publishStatus.visible && publishStatus.type === "success" && (
+        <div className="fixed top-4 right-4 z-50 max-w-md">
+          <div className="rounded-lg border shadow-lg px-4 py-4 transition-all duration-300 transform translate-y-0 opacity-100 border-green-200 bg-green-50 text-green-800">
+            <div className="flex items-start gap-3">
+              <div className="flex-shrink-0 mt-0.5">
+                <CheckCircle className="h-5 w-5 text-green-600" />
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-medium">{publishStatus.message}</p>
+                <p className="text-xs text-green-700 mt-1">
+                  Tu anuncio ya está disponible para los compradores.
+                </p>
+                {isRedirecting && redirectCountdown > 0 && (
+                  <div className="mt-2 flex items-center gap-2">
+                    <Clock className="h-4 w-4 text-green-600" />
+                    <span className="text-xs text-green-700">
+                      Regresando al inicio en {redirectCountdown} segundos...
+                    </span>
+                  </div>
+                )}
+                {isRedirecting && (
+                  <div className="mt-3 flex gap-2">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={cancelRedirect}
+                      className="h-7 px-2 text-xs border-green-300 text-green-700 hover:bg-green-100"
+                    >
+                      Quedarse aquí
+                    </Button>
+                    <Button
+                      size="sm"
+                      onClick={() => router.push("/")}
+                      className="h-7 px-2 text-xs bg-green-600 hover:bg-green-700 text-white"
+                    >
+                      Ir ahora
+                    </Button>
+                  </div>
+                )}
+              </div>
+              <button
+                onClick={hidePublishFeedback}
+                className="flex-shrink-0 rounded-md p-1 hover:bg-white/50 transition-colors text-green-500"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Toast Notification Error */}
+      {publishStatus.visible && publishStatus.type === "error" && (
+        <div className="fixed top-4 right-4 z-50 max-w-md">
+          <div className="rounded-lg border shadow-lg px-4 py-3 pr-12 transition-all duration-300 transform translate-y-0 opacity-100 border-red-200 bg-red-50 text-red-800">
+            <div className="flex items-start gap-3">
+              <div className="flex-shrink-0 mt-0.5">
+                <XCircle className="h-5 w-5 text-red-600" />
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-medium">{publishStatus.message}</p>
+              </div>
+              <button
+                onClick={hidePublishFeedback}
+                className="flex-shrink-0 rounded-md p-1 hover:bg-white/50 transition-colors text-red-500"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
 
 export default SellCar;
-

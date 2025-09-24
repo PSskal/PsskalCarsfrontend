@@ -13,6 +13,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"
+  ),
   title: "PsskalCars | Compra y venta de autos en Perú",
   description:
     "Encuentra, vende y compra autos fácilmente en PsskalCars. Plataforma segura, rápida y con la mejor experiencia.",

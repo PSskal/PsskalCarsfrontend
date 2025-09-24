@@ -180,4 +180,20 @@ export const carService = {
     }
     return data;
   },
+
+  async updateCarById(id, updatedFields) {
+    const { data, error } = await supabase
+      .from("cars")
+      .update(updatedFields)
+      .eq("id", id)
+      .select()
+      .single();
+
+    if (error) {
+      console.error("Error updating car:", error);
+      return null;
+    }
+
+    return data;
+  },
 };

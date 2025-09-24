@@ -25,8 +25,7 @@ import { Button } from "@/components/ui/button";
 export default function CarDetailsPage() {
   const { id } = useParams();
   const router = useRouter();
-  const { cars } = useCarContext();
-  const [car, setCar] = useState(null);
+  const { cars, car, setCar } = useCarContext();
   const [images, setImages] = useState([]);
   const { getImagesByCarId, getCarById } = carService;
 
@@ -201,7 +200,10 @@ export default function CarDetailsPage() {
           >
             Contactar por WhatsApp
           </a>
-          <button className="block w-full bg-zinc-800 hover:bg-zinc-700 transition-all py-3 font-medium text-white rounded-xl cursor-pointer text-center">
+          <button
+            className="block w-full bg-zinc-800 hover:bg-zinc-700 transition-all py-3 font-medium text-white rounded-xl cursor-pointer text-center"
+            onClick={() => router.push(`/manage/${car.id}`)}
+          >
             Soy el dueño, cambiar estado del carro
           </button>
         </div>

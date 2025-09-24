@@ -1,16 +1,27 @@
 "use client";
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ArrowRight } from "lucide-react";
 
-const VerificationManage = ({ data, onUpdate, onVerified }) => {
+const VerificationManage = ({ data, onUpdate, onVerified, shouldReset }) => {
   const CODE_LENGTH = 4;
   const [verificationCode, setVerificationCode] = useState(
     Array(CODE_LENGTH).fill("")
   );
 
   const inputsRef = useRef([]);
+
+  // Reiniciar inputs cuando shouldReset cambia a true
+  useEffect(() => {
+    if (shouldReset) {
+      setVerificationCode(Array(CODE_LENGTH).fill(""));
+      // Enfocar el primer input después de limpiar
+      setTimeout(() => {
+        inputsRef.current[0]?.focus();
+      }, 100);
+    }
+  }, [shouldReset]);
 
   const handleCodeChange = (index, rawValue) => {
     const value = (rawValue || "").replace(/\D/g, ""); // keep digits only
@@ -68,6 +79,8 @@ const VerificationManage = ({ data, onUpdate, onVerified }) => {
       alert("Ingresa los 4 dígitos del código");
       return;
     }
+    console.log("Verifying code:", code);
+
     onVerified?.(code);
   };
 

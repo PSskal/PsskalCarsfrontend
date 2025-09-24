@@ -65,13 +65,6 @@ const PhotoUploadStep = ({ data, onUpdate }) => {
     onUpdate(updatedPhotos);
   };
 
-  const toggle360View = (photoId) => {
-    const updatedPhotos = (data || [])?.map((photo) =>
-      photo?.id === photoId ? { ...photo, is360: !photo?.is360 } : photo
-    );
-    onUpdate(updatedPhotos);
-  };
-
   const reorderPhotos = (fromIndex, toIndex) => {
     const updatedPhotos = [...(data || [])];
     const [removed] = updatedPhotos?.splice(fromIndex, 1);
@@ -96,10 +89,10 @@ const PhotoUploadStep = ({ data, onUpdate }) => {
       {/* Upload Area */}
       {photos?.length < maxPhotos && (
         <div
-          className={`relative border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
+          className={`relative border-2 border-dashed rounded-xl p-8 text-center transition-all duration-300 ${
             dragActive
-              ? "border-blue-500 bg-blue-50"
-              : "border-gray-300 hover:border-gray-400"
+              ? "border-blue-500 bg-gradient-to-br from-blue-50 to-blue-100 scale-105 shadow-lg"
+              : "border-gray-300 hover:border-blue-400 hover:bg-gradient-to-br hover:from-gray-50 hover:to-blue-50 hover:shadow-md"
           }`}
           onDragEnter={handleDrag}
           onDragLeave={handleDrag}
@@ -107,35 +100,73 @@ const PhotoUploadStep = ({ data, onUpdate }) => {
           onDrop={handleDrop}
         >
           <div className="flex flex-col items-center space-y-4">
-            <div className="p-3 bg-gray-100 rounded-full">
-              <Upload className="w-8 h-8 text-gray-500" />
+            <div
+              className={`p-4 rounded-full transition-all duration-300 ${
+                uploading
+                  ? "bg-blue-100 animate-pulse"
+                  : dragActive
+                  ? "bg-blue-200"
+                  : "bg-gray-100"
+              }`}
+            >
+              <Upload
+                className={`w-8 h-8 transition-colors duration-300 ${
+                  uploading
+                    ? "text-blue-600 animate-bounce"
+                    : dragActive
+                    ? "text-blue-600"
+                    : "text-gray-500"
+                }`}
+              />
             </div>
             <div>
-              <p className="text-lg font-medium text-gray-900">
-                Arrastra y suelta tus fotos aquí
+              <p
+                className={`text-lg font-medium transition-colors duration-300 ${
+                  uploading
+                    ? "text-blue-600"
+                    : dragActive
+                    ? "text-blue-700"
+                    : "text-gray-900"
+                }`}
+              >
+                {uploading
+                  ? "📷 Subiendo tus fotos..."
+                  : dragActive
+                  ? "¡Suelta las fotos aquí!"
+                  : "Arrastra y suelta tus fotos aquí"}
               </p>
-              <p className="text-gray-500">
-                o haz clic para seleccionar archivos
+              <p
+                className={`transition-colors duration-300 ${
+                  uploading
+                    ? "text-blue-500"
+                    : dragActive
+                    ? "text-blue-600"
+                    : "text-gray-500"
+                }`}
+              >
+                {uploading
+                  ? "Procesando imágenes, por favor espera..."
+                  : "o haz clic en los botones de abajo"}
               </p>
             </div>
-            <div className="flex space-x-4">
+            <div className="flex flex-col sm:flex-row gap-3 sm:space-x-4 sm:gap-0">
               <Button
                 variant="outline"
                 onClick={() => document.getElementById("file-input")?.click()}
                 disabled={uploading}
-                className="flex items-center space-x-2"
+                className="flex items-center justify-center space-x-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white border-0 hover:from-blue-700 hover:to-blue-800 hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <ImageIcon className="w-4 h-4" />
-                <span>Seleccionar Fotos</span>
+                <ImageIcon className="w-5 h-5" />
+                <span className="font-medium">Seleccionar Fotos</span>
               </Button>
               <Button
                 variant="outline"
                 onClick={() => document.getElementById("camera-input")?.click()}
                 disabled={uploading}
-                className="flex items-center space-x-2"
+                className="flex items-center justify-center space-x-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-purple-700 text-white border-0 hover:from-purple-700 hover:to-purple-800 hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <Camera className="w-4 h-4" />
-                <span>Tomar Foto</span>
+                <Camera className="w-5 h-5" />
+                <span className="font-medium">Tomar Foto</span>
               </Button>
             </div>
           </div>
@@ -175,7 +206,7 @@ const PhotoUploadStep = ({ data, onUpdate }) => {
             {photos?.map((photo, index) => (
               <div
                 key={photo?.id}
-                className="relative group bg-gray-100 rounded-lg overflow-hidden aspect-square"
+                className="relative group bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl overflow-hidden aspect-square shadow-sm hover:shadow-xl transition-all duration-300 cursor-move border-2 border-transparent hover:border-blue-200"
                 draggable
                 onDragStart={(e) =>
                   e?.dataTransfer?.setData("text/plain", index)
@@ -192,35 +223,31 @@ const PhotoUploadStep = ({ data, onUpdate }) => {
                 <img
                   src={photo?.url}
                   alt={`Vehículo ${index + 1}`}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                 />
 
                 {/* Main Photo Badge */}
                 {index === 0 && (
-                  <div className="absolute top-2 left-2 bg-blue-600 text-white text-xs px-2 py-1 rounded">
+                  <div className="absolute top-2 left-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white text-xs px-3 py-1 rounded-full shadow-lg font-medium">
                     Principal
                   </div>
                 )}
 
-                {/* Overlay Controls */}
-                <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all duration-200 flex items-center justify-center space-x-2">
+                {/* Floating Action Buttons */}
+                <div className="absolute top-3 right-3 flex flex-col space-y-2 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-2 group-hover:translate-x-0">
                   <Button
                     size="sm"
                     variant="outline"
-                    className="opacity-0 group-hover:opacity-100 transition-opacity bg-white text-gray-900 hover:bg-gray-100"
-                    onClick={() => toggle360View(photo?.id)}
-                  >
-                    <RotateCw className="w-4 h-4" />
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="opacity-0 group-hover:opacity-100 transition-opacity bg-white text-red-600 hover:bg-red-50"
+                    className="w-8 h-8 p-0 bg-white/90 backdrop-blur-sm border-0 shadow-lg text-gray-700 hover:bg-red-50 hover:text-red-600 hover:shadow-xl transition-all duration-200"
                     onClick={() => removePhoto(photo?.id)}
+                    title="Eliminar foto"
                   >
-                    <X className="w-4 h-4" />
+                    <X className="w-3.5 h-3.5" />
                   </Button>
                 </div>
+
+                {/* Subtle overlay for better button visibility */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
               </div>
             ))}
           </div>

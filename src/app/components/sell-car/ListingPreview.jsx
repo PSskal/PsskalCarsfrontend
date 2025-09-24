@@ -91,6 +91,7 @@ const ListingPreview = ({ data, onTokenChange }) => {
             transmission: vehicleDetails.transmission,
             location: data?.contact?.location,
             posted_at: new Date().toISOString(),
+            status: "disponible",
           }}
           disableNavigation
         />

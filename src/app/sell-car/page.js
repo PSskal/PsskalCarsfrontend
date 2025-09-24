@@ -309,7 +309,7 @@ const SellCar = () => {
       description: contact.additionalInfo || "",
       contact_phone: contact.phone,
       car_token: car_token?.trim(),
-      status: "Disponible",
+      status: "disponible",
     };
 
     // Remove undefined/null/empty values

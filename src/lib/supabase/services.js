@@ -20,7 +20,10 @@ const getFileExtension = (file) => {
 
 export const carService = {
   async getCars() {
-    const { data, error } = await supabase.from("cars").select("*");
+    const { data, error } = await supabase
+      .from("cars")
+      .select("*")
+      .order("created_at", { ascending: false });
     if (error) {
       console.error("Error fetching cars:", error);
       return [];
@@ -45,7 +48,8 @@ export const carService = {
     const { data, error } = await supabase
       .from("cars")
       .select("*")
-      .eq("location", location);
+      .eq("location", location)
+      .order("created_at", { ascending: false });
     if (error) {
       console.error("Error fetching cars by location:", error);
       return [];
@@ -76,6 +80,9 @@ export const carService = {
 
     if (priceRange)
       query = query.gte("price", priceRange[0]).lte("price", priceRange[1]);
+
+    // Siempre ordenar por fecha de creación descendente (más recientes primero)
+    query = query.order("created_at", { ascending: false });
 
     const { data, error } = await query;
     if (error) {

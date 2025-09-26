@@ -60,7 +60,7 @@ const CarCard = ({ car, disableNavigation }) => {
       </div>
 
       <div className="p-4 sm:p-5">
-        <div className="flex justify-between items-start mb-2">
+        <div className="flex justify-between items-start">
           <div>
             <h3 className="text-lg font-medium">
               {car.brand} {car.model}
@@ -70,7 +70,7 @@ const CarCard = ({ car, disableNavigation }) => {
             </p>
           </div>
         </div>
-        <div className="mt-4 grid grid-cols-2 gap-y-2 text-gray-600">
+        <div className="mt-3 grid grid-cols-2 text-gray-600">
           <div className="flex items-center text-sm text-muted-foreground">
             <BsPeopleFill className="mr-2" />
             <span>{car.color}</span>

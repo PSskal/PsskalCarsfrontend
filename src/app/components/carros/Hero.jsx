@@ -1,4 +1,5 @@
 "use client";
+import { Input } from "@/components/ui/input";
 import React, { useState } from "react";
 import { FaSearch, FaFilter, FaSlidersH } from "react-icons/fa";
 
@@ -10,10 +11,10 @@ export default function Hero({
   setStatusCar,
 }) {
   return (
-    <div className="max-h-screen bg-gray-50 mt-20">
+    <div className="max-h-screen bg-gray-50 mt-19">
       {/* Header */}
       <div className="bg-white border-b">
-        <div className="max-w-8xl mx-auto px-10 py-4">
+        <div className="max-w-8xl mx-auto px-10 py-2">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-15">
               <div className="flex bg-gray-100 rounded-lg p-1">
@@ -41,7 +42,7 @@ export default function Hero({
 
               <div className="relative">
                 <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                <input
+                <Input
                   type="text"
                   placeholder="Encuentra tu auto aquí..."
                   className="pl-10 md:w-120 lg:w-160 py-2 rounded-md border border-gray-300 focus:outline-none"

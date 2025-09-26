@@ -23,7 +23,7 @@ export const carService = {
     const { data, error } = await supabase
       .from("cars")
       .select("*")
-      .order("created_at", { ascending: false });
+      .order("posted_at", { ascending: false });
     if (error) {
       console.error("Error fetching cars:", error);
       return [];
@@ -49,7 +49,7 @@ export const carService = {
       .from("cars")
       .select("*")
       .eq("location", location)
-      .order("created_at", { ascending: false });
+      .order("posted_at", { ascending: false });
     if (error) {
       console.error("Error fetching cars by location:", error);
       return [];

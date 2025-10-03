@@ -7,6 +7,27 @@ const ListingPreview = ({ data, onTokenChange }) => {
   const vehicleDetails = data?.vehicleDetails || {};
   const photos = data?.photos || [];
 
+  // Función para procesar campos personalizados para la vista previa
+  const processCustomFields = (vehicleDetails) => {
+    return {
+      make:
+        vehicleDetails.make === "Otro" && vehicleDetails.customMake
+          ? vehicleDetails.customMake
+          : vehicleDetails.make,
+      category:
+        vehicleDetails.category === "Otro" && vehicleDetails.customCategory
+          ? vehicleDetails.customCategory
+          : vehicleDetails.category,
+      color:
+        vehicleDetails.color === "Otro" && vehicleDetails.customColor
+          ? vehicleDetails.customColor
+          : vehicleDetails.color,
+    };
+  };
+
+  // Procesar los campos personalizados
+  const processedFields = processCustomFields(vehicleDetails);
+
   const CODE_LENGTH = 4;
   const sanitizedToken = (data?.car_token ?? "")
     .replace(/\D/g, "")
@@ -79,14 +100,14 @@ const ListingPreview = ({ data, onTokenChange }) => {
           car={{
             id: "preview",
             image: photos[0]?.url || photos[0] || "/placeholder.svg",
-            brand: vehicleDetails.make,
+            brand: processedFields.make,
             model: vehicleDetails.model,
             year: vehicleDetails.year,
-            category: vehicleDetails.category,
+            category: processedFields.category,
             price: Number(data?.contact?.askingPrice) || 0,
             currency: data?.contact?.currency || "USD",
             is_available: true,
-            color: vehicleDetails.color,
+            color: processedFields.color,
             fuel_type: vehicleDetails.fuel_type,
             transmission: vehicleDetails.transmission,
             location: data?.contact?.location,

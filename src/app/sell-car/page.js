@@ -185,6 +185,20 @@ const SellCar = () => {
     if (field === "photos") return data.photos?.length > 0;
     if (field === "car_token")
       return /^\d{4}$/.test((data.car_token || "").trim());
+
+    // Validación especial para campos con opción "Otro"
+    if (field === "vehicleDetails.make") {
+      return value && (value !== "Otro" || !!data.vehicleDetails?.customMake);
+    }
+    if (field === "vehicleDetails.category") {
+      return (
+        value && (value !== "Otro" || !!data.vehicleDetails?.customCategory)
+      );
+    }
+    if (field === "vehicleDetails.color") {
+      return value && (value !== "Otro" || !!data.vehicleDetails?.customColor);
+    }
+
     return !!value;
   };
 
@@ -281,30 +295,52 @@ const SellCar = () => {
     return true;
   };
 
+  // Función para procesar campos personalizados
+  const processCustomFields = (vehicleDetails) => {
+    return {
+      ...vehicleDetails,
+      make:
+        vehicleDetails.make === "Otro" && vehicleDetails.customMake
+          ? vehicleDetails.customMake
+          : vehicleDetails.make,
+      category:
+        vehicleDetails.category === "Otro" && vehicleDetails.customCategory
+          ? vehicleDetails.customCategory
+          : vehicleDetails.category,
+      color:
+        vehicleDetails.color === "Otro" && vehicleDetails.customColor
+          ? vehicleDetails.customColor
+          : vehicleDetails.color,
+    };
+  };
+
   const createCarPayload = (
     vehicleDetails,
     contact,
     car_token,
     primaryImage
   ) => {
-    const year = Number(vehicleDetails.year);
-    const mileage = Number(vehicleDetails.mileage);
+    // Procesar campos personalizados antes de crear el payload
+    const processedVehicleDetails = processCustomFields(vehicleDetails);
+
+    const year = Number(processedVehicleDetails.year);
+    const mileage = Number(processedVehicleDetails.mileage);
     const price = Number(contact.askingPrice);
 
     const payload = {
-      brand: vehicleDetails.make,
-      model: vehicleDetails.model,
+      brand: processedVehicleDetails.make,
+      model: processedVehicleDetails.model,
       year: Number.isNaN(year) ? undefined : year,
-      category: vehicleDetails.category,
+      category: processedVehicleDetails.category,
       image: primaryImage,
       price: Number.isNaN(price) ? undefined : price,
       currency: contact.currency || "USD",
       is_available: true,
       mileage: Number.isNaN(mileage) ? undefined : mileage,
-      color: vehicleDetails.color,
-      fuel_type: vehicleDetails.fuel_type,
-      transmission: vehicleDetails.transmission,
-      drive_type: vehicleDetails.traction,
+      color: processedVehicleDetails.color,
+      fuel_type: processedVehicleDetails.fuel_type,
+      transmission: processedVehicleDetails.transmission,
+      drive_type: processedVehicleDetails.traction,
       location: contact.location,
       description: contact.additionalInfo || "",
       contact_phone: contact.phone,

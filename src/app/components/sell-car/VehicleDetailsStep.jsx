@@ -11,21 +11,32 @@ import {
 const VehicleDetailsStep = ({ data, onUpdate }) => {
   const carMakes = [
     "Toyota",
-    "Honda",
-    "Ford",
-    "Chevrolet",
-    "Nissan",
     "Hyundai",
     "Kia",
-    "Mazda",
+    "Chevrolet",
+    "Nissan",
+    "Suzuki",
     "Volkswagen",
+    "Honda",
+    "Mazda",
+    "Renault",
+    "Mitsubishi",
+    "Ford",
+    "Chery",
+    "Great Wall",
+    "JAC",
+    "BYD",
+    "Geely",
+    "Subaru",
+    "Peugeot",
+    "Fiat",
     "BMW",
     "Mercedes-Benz",
     "Audi",
-    "Subaru",
     "Jeep",
     "Dodge",
     "Chrysler",
+    "Otro",
   ];
   const categories = [
     "Sedán",
@@ -75,7 +86,13 @@ const VehicleDetailsStep = ({ data, onUpdate }) => {
           </label>
           <Select
             value={data?.make || ""}
-            onValueChange={(value) => handleInputChange("make", value)}
+            onValueChange={(value) => {
+              handleInputChange("make", value);
+              // Si no es "Otro", limpiar customMake
+              if (value !== "Otro") {
+                handleInputChange("customMake", "");
+              }
+            }}
             placeholder="Seleccionar marca"
           >
             <SelectTrigger className="w-full">
@@ -89,6 +106,28 @@ const VehicleDetailsStep = ({ data, onUpdate }) => {
               ))}
             </SelectContent>
           </Select>
+
+          {/* Campo personalizado para "Otro" */}
+          {data?.make === "Otro" && (
+            <div className="mt-3">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Especifica la marca *
+              </label>
+              <Input
+                type="text"
+                value={data?.customMake || ""}
+                onChange={(e) =>
+                  handleInputChange("customMake", e.target.value)
+                }
+                placeholder="Ej: Geely, BYD, MG, etc."
+                className="w-full"
+                required
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                Escribe el nombre exacto de la marca de tu vehículo
+              </p>
+            </div>
+          )}
         </div>
         {/* Modelo */}
         <div>
@@ -143,7 +182,13 @@ const VehicleDetailsStep = ({ data, onUpdate }) => {
           </label>
           <Select
             value={data?.category || ""}
-            onValueChange={(value) => handleInputChange("category", value)}
+            onValueChange={(value) => {
+              handleInputChange("category", value);
+              // Si no es "Otro", limpiar customCategory
+              if (value !== "Otro") {
+                handleInputChange("customCategory", "");
+              }
+            }}
             placeholder="Seleccionar categoría"
           >
             <SelectTrigger className="w-full">
@@ -157,6 +202,28 @@ const VehicleDetailsStep = ({ data, onUpdate }) => {
               ))}
             </SelectContent>
           </Select>
+
+          {/* Campo personalizado para "Otro" */}
+          {data?.category === "Otro" && (
+            <div className="mt-3">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Especifica la categoría *
+              </label>
+              <Input
+                type="text"
+                value={data?.customCategory || ""}
+                onChange={(e) =>
+                  handleInputChange("customCategory", e.target.value)
+                }
+                placeholder="Ej: Coupé, Roadster, Minivan, etc."
+                className="w-full"
+                required
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                Describe el tipo de vehículo que mejor se adapte
+              </p>
+            </div>
+          )}
         </div>
         {/* Color */}
         <div>
@@ -165,7 +232,13 @@ const VehicleDetailsStep = ({ data, onUpdate }) => {
           </label>
           <Select
             value={data?.color || ""}
-            onValueChange={(value) => handleInputChange("color", value)}
+            onValueChange={(value) => {
+              handleInputChange("color", value);
+              // Si no es "Otro", limpiar customColor
+              if (value !== "Otro") {
+                handleInputChange("customColor", "");
+              }
+            }}
             placeholder="Seleccionar color"
           >
             <SelectTrigger className="w-full">
@@ -179,6 +252,28 @@ const VehicleDetailsStep = ({ data, onUpdate }) => {
               ))}
             </SelectContent>
           </Select>
+
+          {/* Campo personalizado para "Otro" */}
+          {data?.color === "Otro" && (
+            <div className="mt-3">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Especifica el color *
+              </label>
+              <Input
+                type="text"
+                value={data?.customColor || ""}
+                onChange={(e) =>
+                  handleInputChange("customColor", e.target.value)
+                }
+                placeholder="Ej: Verde metalizado, Dorado, Multicolor, etc."
+                className="w-full"
+                required
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                Describe el color principal de tu vehículo
+              </p>
+            </div>
+          )}
         </div>
         {/* Tipo de combustible */}
         <div>

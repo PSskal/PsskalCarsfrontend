@@ -67,7 +67,7 @@ const Home = () => {
         selectedBrands[0].toLowerCase() === car.brand.toLowerCase());
 
     const matchesTestDrive =
-      !isAutomatic || car.transmission?.includes("Automatico");
+      !isAutomatic || car.transmission?.includes("Automática");
     const matchesPriceRange =
       car.price >= priceRange[0] && car.price <= priceRange[1];
     const matchesStatus =

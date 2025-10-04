@@ -76,7 +76,7 @@ export const carService = {
     if (selectedBrands && selectedBrands[0] !== "All Brand")
       query = query.in("brand", selectedBrands);
 
-    if (isAutomatic) query = query.eq("transmission", "Automatico");
+    if (isAutomatic) query = query.eq("transmission", "Automática");
 
     if (priceRange)
       query = query.gte("price", priceRange[0]).lte("price", priceRange[1]);

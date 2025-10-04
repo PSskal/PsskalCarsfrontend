@@ -1,26 +1,25 @@
 "use client";
-import { useParams, useRouter } from "next/navigation";
-import { useCarContext } from "@/context/CarContext";
-import { useEffect, useState } from "react";
-import { FaArrowLeft } from "react-icons/fa";
-import { BsPeopleFill, BsFillFuelPumpFill } from "react-icons/bs";
-import { FaCarAlt } from "react-icons/fa";
-import { FaRegCalendarTimes } from "react-icons/fa";
-import { MdLocationPin } from "react-icons/md";
-import Loader from "@/app/components/carros/Loader";
-import { IoIosColorFill } from "react-icons/io";
-import { VscSymbolProperty } from "react-icons/vsc";
-import { TbCategoryFilled } from "react-icons/tb";
-import { carService } from "@/lib/supabase/services";
+
+import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from "@/components/ui/carousel";
+import Link from "next/link";
+import { useParams, useRouter } from "next/navigation";
+import { FaArrowLeft, FaCarAlt } from "react-icons/fa";
+import { FaRegCalendarTimes } from "react-icons/fa";
+import { IoIosColorFill } from "react-icons/io";
+import { MdLocationPin } from "react-icons/md";
+import { TbCategoryFilled } from "react-icons/tb";
+import { BsFillFuelPumpFill } from "react-icons/bs";
+import { VscSymbolProperty } from "react-icons/vsc";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
+import { Separator } from "@/components/ui/separator";
+import Loader from "@/components/carros/Loader";
+import { useCarContext } from "@/context/CarContext";
+import { carService } from "@/lib/supabase/services";
+
+const INFO_ICON_CLASSES = "text-primary text-xl";
 
 export default function CarDetailsPage() {
   const { id } = useParams();
@@ -36,180 +35,208 @@ export default function CarDetailsPage() {
       const numericId = Number(id);
       const carId = Number.isNaN(numericId) ? id : numericId;
 
-      let found = cars.find((c) => c.id === carId);
-      // Si no se encuentra por coincidencia estricta, intentar con conversión a cadena
+      let found = cars.find((current) => current.id === carId);
       if (!found) {
-        found = cars.find((c) => String(c.id) === String(id));
+        found = cars.find((current) => String(current.id) === String(id));
       }
 
       let carData = found;
       if (!found) {
         carData = await getCarById(carId);
       }
-      setCar(carData);
+      if (carData) {
+        setCar(carData);
+      }
 
       const carImages = await getImagesByCarId(carId);
       let imageUrls = Array.isArray(carImages)
-        ? carImages.map((img) => img.image_url)
+        ? carImages.map((image) => image.image_url)
         : [];
 
       if (carData?.image && !imageUrls.includes(carData.image)) {
         imageUrls = [carData.image, ...imageUrls];
       } else if (carData?.image) {
-        imageUrls = [
-          carData.image,
-          ...imageUrls.filter((url) => url !== carData.image),
-        ];
+        imageUrls = [carData.image, ...imageUrls.filter((url) => url !== carData.image)];
       }
 
       setImages(imageUrls);
     };
 
     fetchData();
-  }, [id, cars]);
+  }, [cars, getCarById, getImagesByCarId, id, setCar]);
 
-  return car ? (
-    <div className="px-6 md:px-16 lg:px-24 xl:px-32 bg-white">
+  const highlights = useMemo(() => {
+    if (!car) return [];
+
+    return [
+      {
+        icon: <TbCategoryFilled className={INFO_ICON_CLASSES} />,
+        label: "Categoría",
+        value: car.category,
+      },
+      {
+        icon: <FaRegCalendarTimes className={INFO_ICON_CLASSES} />,
+        label: "Año Modelo",
+        value: car.year,
+      },
+      {
+        icon: <IoIosColorFill className={INFO_ICON_CLASSES} />,
+        label: "Color",
+        value: car.color,
+      },
+      {
+        icon: <BsFillFuelPumpFill className={INFO_ICON_CLASSES} />,
+        label: "Combustible",
+        value: car.fuel_type,
+      },
+      {
+        icon: <FaCarAlt className={INFO_ICON_CLASSES} />,
+        label: "Transmisión",
+        value: car.transmission,
+      },
+      {
+        icon: <MdLocationPin className={INFO_ICON_CLASSES} />,
+        label: "Ubicación",
+        value: car.location,
+      },
+      {
+        icon: <FaCarAlt className={INFO_ICON_CLASSES} />,
+        label: "Kilometraje",
+        value: car.mileage?.toLocaleString("es-PE") ? `${car.mileage.toLocaleString("es-PE")} km` : "N/D",
+      },
+      {
+        icon: <VscSymbolProperty className={INFO_ICON_CLASSES} />,
+        label: "Tracción",
+        value: car.drive_type,
+      },
+    ];
+  }, [car]);
+
+  if (!car) {
+    return <Loader />;
+  }
+
+  return (
+    <div className="bg-background px-6 pb-12 pt-8 md:px-16 lg:px-24 xl:px-32">
       <Button
-        className="mt-8 mb-8 bg-white hover:bg-white flex items-center gap-2 text-gray-500 cursor-pointer"
+        variant="ghost"
+        size="sm"
+        className="mb-8 w-fit gap-2 text-muted-foreground"
         onClick={() => router.back()}
       >
         <FaArrowLeft /> Volver a todos los autos
       </Button>
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
-        {/* Imagen del auto */}
-        <div className="lg:col-span-2">
-          {/* Carrusel */}
-          <div className="relative overflow-hidden lg:h-[38rem] rounded-lg">
-            <Carousel className="overflow-hidden relative w-full  rounded-lg mb-8 bg-gray-100">
-              <CarouselContent>
-                {images.map((img, idx) => (
-                  <CarouselItem key={idx}>
-                    <Image
-                      src={img}
-                      alt={`auto-img-${idx}`}
-                      className="w-full h-auto object-cover"
-                      width={400}
-                      height={192}
-                    />
-                  </CarouselItem>
-                ))}
-              </CarouselContent>
-              <CarouselPrevious className="cursor-pointer absolute top-1/2 left-4 -translate-y-1/2 z-30 bg-white/30 rounded-full p-2 hover:bg-orange-400 hover:text-white transition-colors" />
-              <CarouselNext className="cursor-pointer absolute top-1/2 right-4 -translate-y-1/2 z-30 bg-white/30 rounded-full p-2 hover:bg-orange-400 hover:text-white transition-colors" />
-            </Carousel>
-          </div>
 
-          {/* Datos del auto */}
-          <div className="space-y-6">
-            <div>
-              <h1 className="text-3xl font-bold lg:mt-8">
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-3 lg:gap-12">
+        <section className="space-y-8 lg:col-span-2">
+          <Card className="overflow-hidden">
+            <CardContent className="p-0">
+              <Carousel className="w-full">
+                <CarouselContent>
+                  {images.length > 0 ? (
+                    images.map((imageUrl, index) => (
+                      <CarouselItem key={imageUrl ?? index}>
+                        <Image
+                          src={imageUrl}
+                          alt={`auto-img-${index}`}
+                          className="h-auto w-full object-cover"
+                          width={1024}
+                          height={512}
+                          priority={index === 0}
+                        />
+                      </CarouselItem>
+                    ))
+                  ) : (
+                    <CarouselItem>
+                      <div className="flex h-72 items-center justify-center bg-muted text-muted-foreground">
+                        Sin imágenes disponibles
+                      </div>
+                    </CarouselItem>
+                  )}
+                </CarouselContent>
+                {images.length > 1 ? (
+                  <>
+                    <CarouselPrevious className="left-4 top-1/2 -translate-y-1/2" />
+                    <CarouselNext className="right-4 top-1/2 -translate-y-1/2" />
+                  </>
+                ) : null}
+              </Carousel>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-3xl font-bold">
                 {car.brand} {car.model}
-              </h1>
-            </div>
-            {/* título */}
+              </CardTitle>
+              <p className="text-sm text-muted-foreground">Detalles del vehículo</p>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div>
+                <Separator className="my-4" />
+                <h2 className="text-lg font-semibold">Información del vehículo</h2>
+              </div>
 
-            {/* subtítulo */}
-            <h2 className="text-xl font-semibold mt-8">
-              Información del vehículo
-            </h2>
+              <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+                {highlights.map((item) => (
+                  <Card key={`${item.label}-${item.value ?? "unknown"}`} className="shadow-none">
+                    <CardContent className="flex h-full flex-col items-center justify-center gap-2 p-4 text-center">
+                      <span>{item.icon}</span>
+                      <p className="text-xs uppercase tracking-wide text-muted-foreground">
+                        {item.label}
+                      </p>
+                      <p className="text-sm font-semibold text-foreground">
+                        {item.value || "N/D"}
+                      </p>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
 
-            <hr className="border-borderColor my-6" />
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-              {[
-                {
-                  icon: <TbCategoryFilled />,
-                  text: `${car.category}`,
-                  info: "Categoría",
-                },
-                {
-                  icon: <FaRegCalendarTimes />,
-                  text: `${car.year}`,
-                  info: "Año Modelo",
-                },
-                {
-                  icon: <IoIosColorFill />,
-                  text: `${car.color}`,
-                  info: "Color",
-                },
-                {
-                  icon: <BsFillFuelPumpFill />,
-                  text: `${car.fuel_type}`,
-                  info: "Combustible",
-                },
-                {
-                  icon: <FaCarAlt />,
-                  text: `${car.transmission}`,
-                  info: "Transmisión",
-                },
-                {
-                  icon: <MdLocationPin />,
-                  text: `${car.location}`,
-                  info: "Ubicación",
-                },
-                {
-                  icon: <FaCarAlt />,
-                  text: `${car.mileage.toLocaleString("es-PE")} km`,
-                  info: "Kilometraje",
-                },
-                {
-                  icon: <VscSymbolProperty />,
-                  text: `${car.drive_type}`,
-                  info: "Tracción",
-                },
-              ].map(({ icon, text, info }) => (
-                <div
-                  key={info}
-                  className="flex flex-col items-center bg-white rounded-lg p-4 text-gray-500 shadow-lg"
-                >
-                  <div className="p-4 flex flex-col items-center justify-center h-full">
-                    <span className="w-6 h-6 text-gray-900 mb-2 font-bold">
-                      {icon}
-                    </span>
-                    <p className="text-xs text-gray-500 mb-1">{info}</p>
-                    <p className="text-sm font-semibold text-gray-900">
-                      {text}
-                    </p>
-                  </div>
+              {car.description ? (
+                <div className="space-y-2">
+                  <h3 className="text-lg font-semibold">Información adicional</h3>
+                  <p className="text-sm leading-relaxed text-muted-foreground">{car.description}</p>
                 </div>
-              ))}
-            </div>
+              ) : null}
+            </CardContent>
+          </Card>
+        </section>
 
-            {/* descripción */}
-            <div className="lg:mb-16">
-              <h1 className="text-xl font-medium mb-3">
-                Información adicional
-              </h1>
-              <p className="text-gray-500">{car.description}</p>
-            </div>
-          </div>
-        </div>
-        {/* lado derecho contacto */}
-        <div className="shadow-lg h-max sticky top-30 rounded-xl p-6 space-y-6 text-gray-500">
-          <p className="text-2xl text-black font-bold text-center ">
-            Precio: {car.price.toLocaleString("es-PE")}{" "}
-            {car.currency === "USD" ? "Dolares" : "Soles"}
-          </p>
-          <hr className="border-zinc-400" />
-
-          <a
-            href={`https://wa.me/${car.contact_phone}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="block w-full bg-blue-600 hover:bg-blue-800 transition-all py-3 font-medium text-white rounded-xl cursor-pointer text-center"
-          >
-            Contactar por WhatsApp
-          </a>
-          <button
-            className="block w-full bg-zinc-800 hover:bg-zinc-700 transition-all py-3 font-medium text-white rounded-xl cursor-pointer text-center"
-            onClick={() => router.push(`/manage/${car.id}`)}
-          >
-            Soy el dueño, cambiar estado del carro
-          </button>
-        </div>
+        <aside className="lg:col-span-1 lg:pl-2">
+          <Card className="sticky top-28">
+            <CardHeader>
+              <CardTitle className="text-center text-2xl">
+                Precio: {car.price.toLocaleString("es-PE")}{" "}
+                {car.currency === "USD" ? "Dólares" : "Soles"}
+              </CardTitle>
+            </CardHeader>
+            <Separator />
+            <CardContent className="space-y-4 pt-6">
+              <Button asChild className="w-full" size="lg">
+                <Link
+                  href={`https://wa.me/${car.contact_phone}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Contactar por WhatsApp
+                </Link>
+              </Button>
+              <Button
+                className="w-full"
+                size="lg"
+                variant="secondary"
+                onClick={() => router.push(`/manage/${car.id}`)}
+              >
+                Soy el dueño, cambiar estado del carro
+              </Button>
+            </CardContent>
+            <CardFooter className="justify-center text-xs text-muted-foreground">
+              Nos pondremos en contacto contigo lo antes posible.
+            </CardFooter>
+          </Card>
+        </aside>
       </div>
     </div>
-  ) : (
-    <Loader />
   );
 }

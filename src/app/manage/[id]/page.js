@@ -7,8 +7,8 @@ import { useCarContext } from "@/context/CarContext";
 import { carService } from "@/lib/supabase/services";
 import { CheckCircle, XCircle, X, Clock } from "lucide-react";
 
-import VehicleEditStep from "@/app/components/manage/VehicleEditStep";
-import VerificationManage from "@/app/components/manage/VerificationManage";
+import VehicleEditStep from "@/components/manage/VehicleEditStep";
+import VerificationManage from "@/components/manage/VerificationManage";
 
 const ManageCar = () => {
   const router = useRouter();

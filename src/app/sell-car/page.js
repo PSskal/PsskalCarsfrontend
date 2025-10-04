@@ -15,12 +15,12 @@ import {
   X,
   Clock,
 } from "lucide-react";
-import VehicleDetailsStep from "@/app/components/sell-car/VehicleDetailsStep";
-import PhotoUploadStep from "@/app/components/sell-car/PhotoUploadStep";
-import ContactStep from "@/app/components/sell-car/ContactStep";
+import VehicleDetailsStep from "@/components/sell-car/VehicleDetailsStep";
+import PhotoUploadStep from "@/components/sell-car/PhotoUploadStep";
+import ContactStep from "@/components/sell-car/ContactStep";
 import { carService } from "@/lib/supabase/services";
-import Verification from "../components/sell-car/Verification";
-import ListingPreview from "../components/sell-car/ListingPreview";
+import Verification from "../../components/sell-car/Verification";
+import ListingPreview from "../../components/sell-car/ListingPreview";
 const getInitialFormState = () => ({
   vehicleDetails: {
     make: "",

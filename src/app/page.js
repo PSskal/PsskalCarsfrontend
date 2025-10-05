@@ -93,6 +93,30 @@ const Home = () => {
     }
   };
 
+  // Función para remover filtros activos
+  const handleRemoveFilter = (filterType) => {
+    switch (filterType) {
+      case "brand":
+        setSelectedBrands(["All Brand"]);
+        break;
+      case "automatic":
+        setIsAutomatic(false);
+        break;
+      case "type":
+        setCarType("New Car");
+        break;
+      default:
+        break;
+    }
+  };
+
+  // Crear objeto de filtros activos
+  const activeFilters = {
+    brand: selectedBrands[0],
+    automatic: isAutomatic,
+    type: carType,
+  };
+
   if (!mounted) return null;
 
   return isMobile ? (
@@ -158,6 +182,9 @@ const Home = () => {
             filteredCars={filteredCars}
             page={page}
             setPage={setPage}
+            activeFilters={activeFilters}
+            onRemoveFilter={handleRemoveFilter}
+            priceRange={priceRange}
           />
         </div>
       </div>

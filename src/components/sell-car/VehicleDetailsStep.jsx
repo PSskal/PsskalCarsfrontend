@@ -1,5 +1,4 @@
 import React, { useCallback } from "react";
-import PropTypes from "prop-types";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -70,9 +69,19 @@ const TRANSMISSIONS = ["Automática", "Mecánica"];
 const TRACTIONS = ["Delantera", "Trasera", "4x4", "AWD"];
 
 const CURRENT_YEAR = new Date().getFullYear();
-const YEAR_OPTIONS = Array.from({ length: 30 }, (_, index) => CURRENT_YEAR - index);
+const YEAR_OPTIONS = Array.from(
+  { length: 30 },
+  (_, index) => CURRENT_YEAR - index
+);
 
-const FieldGroup = ({ children, className, helperText, id, label, required }) => (
+const FieldGroup = ({
+  children,
+  className,
+  helperText,
+  id,
+  label,
+  required,
+}) => (
   <div className={`space-y-2${className ? ` ${className}` : ""}`}>
     <Label htmlFor={id} className="text-sm font-semibold text-slate-700">
       {label}
@@ -83,27 +92,12 @@ const FieldGroup = ({ children, className, helperText, id, label, required }) =>
   </div>
 );
 
-FieldGroup.propTypes = {
-  children: PropTypes.func.isRequired,
-  className: PropTypes.string,
-  helperText: PropTypes.string,
-  id: PropTypes.string.isRequired,
-  label: PropTypes.string.isRequired,
-  required: PropTypes.bool,
-};
-
-FieldGroup.defaultProps = {
-  className: undefined,
-  helperText: undefined,
-  required: false,
-};
-
 const VehicleDetailsStep = ({ data = {}, onUpdate }) => {
   const handleFieldChange = useCallback(
     (field, value) => {
       onUpdate({ [field]: value });
     },
-    [onUpdate],
+    [onUpdate]
   );
 
   const handleSelectWithOther = useCallback(
@@ -113,15 +107,18 @@ const VehicleDetailsStep = ({ data = {}, onUpdate }) => {
         handleFieldChange(otherField, "");
       }
     },
-    [handleFieldChange],
+    [handleFieldChange]
   );
 
   return (
     <div className="space-y-8 p-8">
       <header className="space-y-2">
-        <h2 className="text-2xl font-semibold text-slate-900">Detalles del Vehículo</h2>
+        <h2 className="text-2xl font-semibold text-slate-900">
+          Detalles del Vehículo
+        </h2>
         <p className="text-slate-600">
-          Proporciona información básica sobre tu vehículo para ayudar a los compradores.
+          Proporciona información básica sobre tu vehículo para ayudar a los
+          compradores.
         </p>
       </header>
 
@@ -151,7 +148,9 @@ const VehicleDetailsStep = ({ data = {}, onUpdate }) => {
             <Input
               id={controlId}
               value={data.model ?? ""}
-              onChange={(event) => handleFieldChange("model", event.target.value)}
+              onChange={(event) =>
+                handleFieldChange("model", event.target.value)
+              }
               placeholder="Ej: Tucson, Hilux, Captiva, etc."
               autoComplete="off"
             />
@@ -203,7 +202,9 @@ const VehicleDetailsStep = ({ data = {}, onUpdate }) => {
             <Input
               id={controlId}
               value={data.version ?? ""}
-              onChange={(event) => handleFieldChange("version", event.target.value)}
+              onChange={(event) =>
+                handleFieldChange("version", event.target.value)
+              }
               placeholder="Ej: Limited, Sport, GLS, etc."
               autoComplete="off"
             />
@@ -215,7 +216,9 @@ const VehicleDetailsStep = ({ data = {}, onUpdate }) => {
             <Input
               id={controlId}
               value={data.body_type ?? ""}
-              onChange={(event) => handleFieldChange("body_type", event.target.value)}
+              onChange={(event) =>
+                handleFieldChange("body_type", event.target.value)
+              }
               placeholder="Ej: 5 puertas, doble cabina, coupé, etc."
               autoComplete="off"
             />
@@ -235,7 +238,9 @@ const VehicleDetailsStep = ({ data = {}, onUpdate }) => {
               min="0"
               step="1"
               value={data.mileage ?? ""}
-              onChange={(event) => handleFieldChange("mileage", event.target.value)}
+              onChange={(event) =>
+                handleFieldChange("mileage", event.target.value)
+              }
               placeholder="Ej: 45 000"
               inputMode="numeric"
             />
@@ -252,7 +257,9 @@ const VehicleDetailsStep = ({ data = {}, onUpdate }) => {
             <Input
               id={controlId}
               value={data.engine ?? ""}
-              onChange={(event) => handleFieldChange("engine", event.target.value)}
+              onChange={(event) =>
+                handleFieldChange("engine", event.target.value)
+              }
               placeholder="Describe la cilindrada o referencia del motor"
               autoComplete="off"
             />
@@ -303,7 +310,9 @@ const VehicleDetailsStep = ({ data = {}, onUpdate }) => {
           {(controlId) => (
             <Select
               value={data.transmission ?? ""}
-              onValueChange={(value) => handleFieldChange("transmission", value)}
+              onValueChange={(value) =>
+                handleFieldChange("transmission", value)
+              }
             >
               <SelectTrigger id={controlId} className="w-full">
                 <SelectValue placeholder="Seleccionar transmisión" />
@@ -351,7 +360,9 @@ const VehicleDetailsStep = ({ data = {}, onUpdate }) => {
               <Input
                 id={controlId}
                 value={data.customMake ?? ""}
-                onChange={(event) => handleFieldChange("customMake", event.target.value)}
+                onChange={(event) =>
+                  handleFieldChange("customMake", event.target.value)
+                }
                 placeholder="Ej: Geely, BYD, MG, etc."
                 autoComplete="off"
               />
@@ -371,7 +382,9 @@ const VehicleDetailsStep = ({ data = {}, onUpdate }) => {
               <Input
                 id={controlId}
                 value={data.customColor ?? ""}
-                onChange={(event) => handleFieldChange("customColor", event.target.value)}
+                onChange={(event) =>
+                  handleFieldChange("customColor", event.target.value)
+                }
                 placeholder="Ej: Verde metalizado, Dorado, Multicolor, etc."
                 autoComplete="off"
               />
@@ -382,31 +395,12 @@ const VehicleDetailsStep = ({ data = {}, onUpdate }) => {
 
       <aside className="rounded-xl border border-blue-200 bg-blue-50 p-4 text-blue-900">
         <p className="text-sm">
-          <strong>Consejo:</strong> Proporciona información precisa y completa para atraer a más compradores interesados.
+          <strong>Consejo:</strong> Proporciona información precisa y completa
+          para atraer a más compradores interesados.
         </p>
       </aside>
     </div>
   );
-};
-
-VehicleDetailsStep.propTypes = {
-  data: PropTypes.shape({
-    body_type: PropTypes.string,
-    category: PropTypes.string,
-    color: PropTypes.string,
-    customColor: PropTypes.string,
-    customMake: PropTypes.string,
-    engine: PropTypes.string,
-    fuel_type: PropTypes.string,
-    make: PropTypes.string,
-    mileage: PropTypes.string,
-    model: PropTypes.string,
-    traction: PropTypes.string,
-    transmission: PropTypes.string,
-    version: PropTypes.string,
-    year: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-  }),
-  onUpdate: PropTypes.func.isRequired,
 };
 
 export default VehicleDetailsStep;

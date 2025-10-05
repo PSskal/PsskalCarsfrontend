@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+﻿import React, { useEffect, useRef, useState } from "react";
 import CarCard from "./CarCard";
 
 const FeacturedSectionsMobile = ({ filteredCars }) => {
@@ -30,8 +30,8 @@ const FeacturedSectionsMobile = ({ filteredCars }) => {
   const carsToShow = cars.slice(0, visibleCount);
 
   return (
-    <div className="z-0 flex flex-col items-center px-6 md:px-4 lg:px-10 xl:px-7">
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-5">
+    <div className="z-0 flex flex-col px-6 md:px-4 lg:px-10 xl:px-7">
+      <div className="grid w-full grid-cols-1 gap-6 mt-5 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
         {carsToShow.map((car) => (
           <div key={car.id}>
             <CarCard

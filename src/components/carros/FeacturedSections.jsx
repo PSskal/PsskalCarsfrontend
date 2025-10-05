@@ -1,6 +1,5 @@
-import React from "react";
+﻿import React from "react";
 import CarCard from "./CarCard";
-import { FaArrowRight } from "react-icons/fa";
 import {
   Pagination,
   PaginationContent,
@@ -30,8 +29,8 @@ const FeacturedSections = ({ filteredCars, page, setPage }) => {
           <PaginationLink
             href="#"
             isActive={i === page}
-            onClick={(e) => {
-              e.preventDefault();
+            onClick={(event) => {
+              event.preventDefault();
               handlePageChange(i);
             }}
           >
@@ -44,12 +43,10 @@ const FeacturedSections = ({ filteredCars, page, setPage }) => {
   };
 
   return (
-    <div
-      className={`flex flex-col items-center px-6 md:px-4 lg:px-10 xl:px-7 `}
-    >
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-5">
+    <div className="flex flex-col px-6 md:px-4 lg:px-10 xl:px-7">
+      <div className="grid w-full grid-cols-1 gap-6 mt-5 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
         {carsToShow.map((car) => (
-          <div key={car.id} className="">
+          <div key={car.id}>
             <CarCard
               car={car}
               className="flex-1 h-full"
@@ -64,8 +61,8 @@ const FeacturedSections = ({ filteredCars, page, setPage }) => {
             <PaginationItem>
               <PaginationPrevious
                 href="#"
-                onClick={(e) => {
-                  e.preventDefault();
+                onClick={(event) => {
+                  event.preventDefault();
                   if (page > 1) handlePageChange(page - 1);
                 }}
                 aria-disabled={page === 1}
@@ -75,8 +72,8 @@ const FeacturedSections = ({ filteredCars, page, setPage }) => {
             <PaginationItem>
               <PaginationNext
                 href="#"
-                onClick={(e) => {
-                  e.preventDefault();
+                onClick={(event) => {
+                  event.preventDefault();
                   if (page < totalPages) handlePageChange(page + 1);
                 }}
                 aria-disabled={page === totalPages}

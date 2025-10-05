@@ -10,7 +10,7 @@ import SearchBar from "../components/carros/SearchBar";
 import SellCarButton from "../components/carros/SellCarButton";
 import FeacturedSectionsMobile from "../components/carros/FeacturedSectionsMobile";
 import { carService } from "@/lib/supabase/services";
-import { useIsMobile } from "@/app/hooks/useIsMobile";
+import { useIsMobile } from "@/lib/hooks/useIsMobile";
 import { useCarContext } from "@/context/CarContext";
 
 const Home = () => {

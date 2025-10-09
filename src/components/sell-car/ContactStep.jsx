@@ -128,7 +128,7 @@ const ContactStep = ({ data, onUpdate }) => {
               handleInputChange("additionalInfo", e.target.value)
             }
             placeholder="Proporciona información adicional sobre el vehículo"
-            className="border rounded px-2 py-1 text-gray-700"
+            className="border border-slate-300 rounded px-2 py-1 text-gray-700"
           />
         </div>
 

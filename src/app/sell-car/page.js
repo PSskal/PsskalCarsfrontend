@@ -409,7 +409,7 @@ const SellCar = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-white shadow-sm border-b">
+      <div className="bg-white shadow-sm border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <Button
@@ -535,7 +535,7 @@ const SellCar = () => {
               </div>
             )}
 
-            <div className="bg-white rounded-lg shadow-sm border">
+            <div className="bg-white rounded-lg shadow-sm border border-slate-200">
               {renderStepContent()}
             </div>
 

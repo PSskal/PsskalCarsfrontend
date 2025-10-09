@@ -108,7 +108,7 @@ const Verification = ({ data, onUpdate, onVerified }) => {
                   ref={(el) => {
                     inputsRef.current[index] = el;
                   }}
-                  className="w-12 h-12 text-center text-lg font-medium border-2 focus:border-purple-600"
+                  className="w-12 h-12 text-center text-lg font-medium border-2 border-slate-300 focus:border-purple-600"
                 />
               ))}
             </div>
